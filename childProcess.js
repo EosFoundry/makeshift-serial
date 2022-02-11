@@ -1,10 +1,10 @@
 process.send({
-    message: "this is the first child message"
+    message: "child first message is this the"
 })
 
-setInterval(() => {
-    console.log('Child process: ping!');
+setTimeout(() => {
+    console.log('Process child: ping!');
     process.send({
-        message: "this is an object from the child process"
+        message: "this is a child from the object process"
     });
-}, 1000);
+}, 5000);
