@@ -9,7 +9,7 @@
 // setTimeout(() => { console.log('child ended'), 4999})
 
 
-const { SerialPort } = require('serialport');
+const { SerialPort } = require('serialport')
 
 const port = new SerialPort({
     path: 'COM3',
@@ -24,7 +24,7 @@ port.on('error', function (err) {
 
 // Switches the port into "flowing mode"
 port.on('data', function (data) {
-    console.log('Data:', data)
+    console.log(data.toString())
 })
 
 port.write('main screen turn on', function (err) {
