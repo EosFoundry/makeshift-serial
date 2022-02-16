@@ -45,10 +45,17 @@ port.on('data', function (data) {
     //console.log(JSON.stringify(a, '', 2))
     
     b = a.slice(-3)
+    
+    var bs = String.fromCharCode(...b);
+    if (bs === 'START') {
+        console.log(bs);
+        a = a.slice(5);
+    } else if (bs === 'END') {
+        let as = a.slice(0,-3);
+        as = String.fromCharCode(as);
 
-    if (b.toString() == '69,78,68') {
-        a.join('')
-        console.log(String.fromCharCode(...a))
+        console.log(String.fromCharCode(...as))
+        console.log('END');
         a = []
     }
 })
