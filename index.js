@@ -11,21 +11,12 @@
 
 const { SerialPort } = require('serialport')
 
+
 const port = new SerialPort({
     path: 'COM3',
-    baudRate: 9600,
+    baudRate: 9600
 })
 
-// Open errors will be emitted as an error event
-port.on('error', function (err) {
-    console.log('Error: ', err.message)
-})
-
-
-// Switches the port into "flowing mode"
-port.on('data', function (data) {
-    console.log(data.toString())
-})
 
 port.write('main screen turn on', function (err) {
     if (err) {
@@ -35,8 +26,38 @@ port.write('main screen turn on', function (err) {
 })
 
 
-setInterval( () => {
-        port.write('Hi Mom!')
-    },
-    1000
+port.on('error', function (err) {
+    console.log('Error: ', err.message)
+})
+
+
+// upon receiving start transmission ('START' from arduino), do SOMETHING, wait for all data to be
+// received, THEN log data
+
+// 
+
+// variable scope: var, x is defined outside of function
+
+var a = []
+
+port.on('data', function (data) {
+    a.push(...data)
+    //console.log(JSON.stringify(a, '', 2))
+    
+    b = a.slice(-3)
+
+    if (b.toString() == '69,78,68') {
+        a.join('')
+        console.log(String.fromCharCode(...a))
+        a = []
+    }
+})
+
+//CLEAR a/BUFFER***
+//if statement not detecting END
+
+setInterval(() => {
+    port.write('Hi Mom!')
+},
+    5000
 )
