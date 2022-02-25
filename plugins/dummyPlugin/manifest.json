@@ -1,0 +1,9 @@
+{
+    "name": "dummyPlugin",
+    "entry": "dummyPlugin.mjs",
+    "functionsAvailable": [
+        "log",
+        "doSomething"
+    ],
+    "toaster": "asdf"
+}
