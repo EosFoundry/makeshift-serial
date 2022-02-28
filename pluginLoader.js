@@ -34,6 +34,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+import { fork } from 'child_process';
 import { readFile } from 'fs/promises';
 import { fileURLToPath } from 'url';
 import path from 'path';
@@ -74,12 +75,15 @@ function loadPlugins() {
 }
 loadPlugins().then(function () {
     console.log('done!');
-    // let plug = fork('./pluginVM');
-    // plug.send({
-    //     name: 'dummyPlugin',
-    //     root: './plugins/dummyPlugin',
-    //     manifest: 
-    //     command: 'init'
-    // });
+    for (var _i = 0, pluginList_2 = pluginList; _i < pluginList_2.length; _i++) {
+        var id = pluginList_2[_i];
+        var vm = fork('./pluginVM');
+        vm.send({
+            name: plugins[id].manifest.name,
+            root: './plugins/' + plugins[id].manifest.name,
+            manifest: plugins[id].manifest,
+            command: 'init'
+        });
+    }
 });
 export { loadPlugins, };

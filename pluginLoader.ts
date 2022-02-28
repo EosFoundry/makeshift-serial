@@ -33,7 +33,6 @@ async function loadPlugins() {
 loadPlugins().then(() => {
     console.log('done!')
     
-
     for (let id of pluginList) {
         let vm = fork('./pluginVM');
         vm.send({
@@ -42,12 +41,9 @@ loadPlugins().then(() => {
             manifest: plugins[id].manifest,
             command: 'init'
         });
-
     }
 
-
 });
-
 
 export {
     loadPlugins,

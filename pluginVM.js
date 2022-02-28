@@ -9,6 +9,9 @@ let config;
 process.on('message', (m) => {
     if (m.command === 'init') {
         config = m;
+        manifest = config.manifest;
+        delete config.manifest;
+        
         console.log('initializing')
         console.log(m.root);
         console.log(config);
@@ -25,18 +28,17 @@ const pluginData = {
 
 async function init ( rootDir , name) {
     try {
-        let manifestPath = path.join (rootDir, 'manifest.json');
+        let manifestPath = path.join(rootDir, 'manifest.json');
         console.log('manifestPath: ', manifestPath);
-        let json = await import (manifestPath);
-        manifest = json.default;
-
         console.log(manifest);
         console.log('config.root : ' + config.root);
         console.log('manifest.entry : ' + manifest.entry);
-        let plugPath = path.join(config.root, manifest.entry);
-        console.log('plugin path:' + plugPath);
+        
+        let plugPath = path.join('', config.root, manifest.entry);
+        console.log('plugin path: ' + plugPath);
 
-        plugin = await import(plugPath);
+        // Using relative path here
+        plugin = await import('./' + plugPath);
         console.log(plugin);
 
     } catch (e) {
