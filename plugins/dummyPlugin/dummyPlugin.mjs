@@ -22,4 +22,5 @@ function log(message) {
 export { 
     pluginData,
     log,
+    doSomething,
 }
