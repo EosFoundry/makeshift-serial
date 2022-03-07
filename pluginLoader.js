@@ -42,7 +42,8 @@ var __filename = fileURLToPath(import.meta.url);
 var __dirname = path.dirname(__filename);
 var __plugin_dir = path.join(__dirname, 'plugins');
 var pluginList = [
-    "dummyPlugin",
+    // "dummyPlugin",
+    "makeshiftctrl-obs",
 ];
 var plugins = {};
 function loadPlugins() {

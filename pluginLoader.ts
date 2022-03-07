@@ -8,7 +8,8 @@ const __dirname = path.dirname(__filename);
 const __plugin_dir = path.join(__dirname, 'plugins');
 
 let pluginList = [
-    "dummyPlugin",
+    // "dummyPlugin",
+    "makeshiftctrl-obs",
 ];
 
 let plugins = {};
