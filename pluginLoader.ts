@@ -8,7 +8,8 @@ const __dirname = path.dirname(__filename);
 const __plugin_dir = path.join(__dirname, 'plugins');
 
 let pluginList = [
-    "dummyPlugin",
+    // "dummyPlugin",
+    "makeshiftctrl-obs",
 ];
 
 let plugins = {};
@@ -27,31 +28,37 @@ async function loadPlugins() {
         let manifest = JSON.parse(data);
         plugins[pluginName].manifest = manifest;
         console.log(manifest);
-    }
+    };
+
+    console.log('done!');
+
     for (let id of pluginList) {
         let vm = fork('./pluginVM');
-        vm.on('message', (m:Message) => {
-            console.log('recieved message from plugin: ' + id);
-            console.log(m.data);
-            if (m.data === 'ready') {
+        vm.on('message', (m: any) => {
+            console.log(`message received from: ${id}`)
+            console.log(m.message)
+
+            if (m.message === 'load successful') {
+                console.log('sending command to VM')
                 vm.send({
-                    command: plugins[id].manifest.functionsAvailable[0]
+                    command: 'run',
+                    functionName: plugins[id].manifest.functionsAvailable[1]
                 })
+            } else if (m.message === 'error loading') {
+                console.log(m.message)
             }
         })
+        
         vm.send({
             name: plugins[id].manifest.name,
             root: './plugins/' + plugins[id].manifest.name,
             manifest: plugins[id].manifest,
-            command: 'init'
+            command: 'init',
         });
-    }
-}
-
-type Message = {
-    data: any;
-}
+    };
+};
 
 export {
     loadPlugins,
+    plugins,
 }

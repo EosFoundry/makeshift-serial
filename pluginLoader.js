@@ -42,7 +42,8 @@ var __filename = fileURLToPath(import.meta.url);
 var __dirname = path.dirname(__filename);
 var __plugin_dir = path.join(__dirname, 'plugins');
 var pluginList = [
-    "dummyPlugin",
+    // "dummyPlugin",
+    "makeshiftctrl-obs",
 ];
 var plugins = {};
 function loadPlugins() {
@@ -69,15 +70,22 @@ function loadPlugins() {
                     _i++;
                     return [3 /*break*/, 1];
                 case 4:
+                    ;
+                    console.log('done!');
                     _loop_1 = function (id) {
                         var vm = fork('./pluginVM');
                         vm.on('message', function (m) {
-                            console.log('recieved message from plugin: ' + id);
-                            console.log(m.data);
-                            if (m.data === 'ready') {
+                            console.log("message received from: ".concat(id));
+                            console.log(m.message);
+                            if (m.message === 'load successful') {
+                                console.log('sending command to VM');
                                 vm.send({
-                                    command: plugins[id].manifest.functionsAvailable[0]
+                                    command: 'run',
+                                    functionName: plugins[id].manifest.functionsAvailable[1]
                                 });
+                            }
+                            else if (m.message === 'error loading') {
+                                console.log(m.message);
                             }
                         });
                         vm.send({
@@ -91,9 +99,11 @@ function loadPlugins() {
                         id = pluginList_2[_a];
                         _loop_1(id);
                     }
+                    ;
                     return [2 /*return*/];
             }
         });
     });
 }
-export { loadPlugins, };
+;
+export { loadPlugins, plugins, };
