@@ -1,9 +1,10 @@
-import { fork } from 'child_process'
+import { ChildProcess, fork } from 'child_process'
 import { readFile } from 'fs/promises';
 import { fileURLToPath } from 'url';
 import path from 'path'
 import { Msg, strfy } from './utils.js'
-
+import { readFileSync } from 'fs';
+import EventEmitter from 'events';
 const msg = Msg('pluginLoader');
 
 const __filename = fileURLToPath(import.meta.url);
@@ -11,67 +12,84 @@ const __dirname = path.dirname(__filename);
 const __plugin_dir = path.join(__dirname, 'plugins');
 
 let pluginList = [
-    // "dummyPlugin",
-    "makeshiftctrl-obs",
+    "dummyPlugin",
+    // "makeshiftctrl-obs",
 ];
 
 let plugins = {};
 
-async function loadPlugins() {
-    for (let id of pluginList) {
-        plugins[id] = {};
+class Plugin extends EventEmitter {
+    manifest: any;
+    id: string;
+    functionsAvailable: string[];
+    sock: ChildProcess;
+    msg: Msg;
 
-        console.log('reading manifest from - ' + id);
+    handleMessage(m: Message): void {
+        msg(`message received from: ${this.id} | Label: ${m.label} | Data: ${strfy(m.data)}`);
+        switch (m.label) {
+            case 'status':
+                if (m.data === 'ready') {
+                    this.emit('ready');
+                } else if (m.data === 'error loading') {
+                    msg(m.data)
+                }
+                break;
+            case 'data':
+                break;
+        }
+    }
 
-        let data = await readFile(
-            path.join(__plugin_dir, id, 'manifest.json'),
-            { encoding: 'UTF8' as BufferEncoding }
-        )
+    runFunction(name: string, args?:string[]): void {
+        this.sock.send({
+            label: 'run',
+            data: {
+                name: name,
+                args: args ? args : []
+            }
+        })
+    }
 
-        let manifest = JSON.parse(data);
-        plugins[id].manifest = manifest;
-        plugins[id].id = manifest.name;
-        plugins[id].functionsAvailable = manifest.functionsAvailable;
-        console.log(manifest);
-    };
+    constructor(manifest: any) {
+        super();
+        this.id = manifest.id;
+        this.manifest = manifest;
+        this.functionsAvailable = manifest.functionsAvailable;
+        this.msg = Msg(this.id);
 
-    console.log('done!');
+        this.msg('Creating new event emittor');
 
-    for (let id of pluginList) {
-        plugins[id].sock = fork('./pluginSock');
+        this.msg('Forking new pluginSock');
+        this.sock = fork('./pluginSock');
+        this.sock.on('message', this.handleMessage.bind(this))
 
-        plugins[id].sock.on('message', handleMessage.bind(plugins[id]))
-
-        plugins[id].sock.send({
-            name: plugins[id].manifest.name,
-            root: './plugins/' + plugins[id].manifest.name,
-            manifest: plugins[id].manifest,
-            command: 'init',
+        this.msg('Initializing pluginSock');
+        this.sock.send({
+            label: 'init',
+            data: {
+                name: this.manifest.name,
+                root: './plugins/' + this.manifest.name,
+                manifest: this.manifest,
+            }
         });
     }
 }
 
-function handleMessage(m: Message) {
-    msg(`message received from: ${this.id}`);
-    msg(`Label: ${m.label}`);
-
-    switch (m.label) {
-        case 'status':
-            if (m.data === 'load successful') {
-                console.log('sending command to VM')
-                this.sock.send({
-                    command: 'run',
-                    functionName: this.manifest.functionsAvailable[1]
-                })
-            } else if (m.data === 'error loading') {
-                console.log(m.data)
-            }
-            break;
-        case 'data':
-            break;
+function loadPlugins() {
+    for (let id of pluginList) {
+        msg('reading manifest from - ' + id);
+        let data = readFileSync(
+            path.join(__plugin_dir, id, 'manifest.json'),
+            { encoding: 'UTF8' as BufferEncoding }
+        )
+        let manifest = JSON.parse(data);
+        msg('Manifest loaded.')
+        msg(manifest);
+        msg('Forking plugin sock...');
+        plugins[id] = new Plugin(manifest);
     }
-
 }
+
 
 type Message = {
     label: string,
