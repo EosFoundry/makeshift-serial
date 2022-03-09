@@ -23,24 +23,25 @@ class Plugin extends EventEmitter {
     id: string;
     functionsAvailable: string[];
     sock: ChildProcess;
-    msg: Msg;
+    msg: Function;
 
-    handleMessage(m: Message): void {
-        msg(`message received from: ${this.id} | Label: ${m.label} | Data: ${strfy(m.data)}`);
+    handleMessage (this:Plugin, m: Message) : void {
+        this.msg(`Message received from sock --> Label: ${m.label} | Data: ${strfy(m.data)}`);
         switch (m.label) {
             case 'status':
                 if (m.data === 'ready') {
-                    this.emit('ready');
+                    super.emit('ready');
                 } else if (m.data === 'error loading') {
-                    msg(m.data)
+                    this.msg(m.data)
                 }
                 break;
             case 'data':
                 break;
         }
-    }
 
-    runFunction(name: string, args?:string[]): void {
+    };
+
+    runFunction (name: string, args?:string[]): void {
         this.sock.send({
             label: 'run',
             data: {
@@ -52,14 +53,14 @@ class Plugin extends EventEmitter {
 
     constructor(manifest: any) {
         super();
-        this.id = manifest.id;
+        this.id = manifest.name;
         this.manifest = manifest;
         this.functionsAvailable = manifest.functionsAvailable;
-        this.msg = Msg(this.id);
+        this.msg = Msg(`Plugin object for ${this.id}`);
 
         this.msg('Creating new event emittor');
 
-        this.msg('Forking new pluginSock');
+        this.msg('Sporking new pluginSock');
         this.sock = fork('./pluginSock');
         this.sock.on('message', this.handleMessage.bind(this))
 

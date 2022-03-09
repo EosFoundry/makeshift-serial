@@ -15,15 +15,8 @@ let config;
 process.on('message', (m) => {
     switch (m.label) {
         case 'init': //loads the manifest data
-            let data = m.data;
-            config = data;
-            manifest = config.manifest;
-            delete config.manifest;
-            msg = Msg(`Plugin=${data.name}`)
-            msg('initializing')
-            msg(data.root);
-            msg(config);
-            init(config.root, config.name).then(() => {
+            config = m.data;
+            init(config).then(() => {
                 process.send({
                     label: 'status',
                     data: 'ready',
@@ -33,8 +26,8 @@ process.on('message', (m) => {
 
         case 'run':
             let func = m.data;
+            msg(`Recieved 'run' message with function data: ${func}`);
             if (manifest.functionsAvailable.includes(func.name)) {
-                msg(`Running function: ${func.name}`);
                 runFunc(func).then((returnValue) => sendFunctionReturn({
                     name: func.name,
                     ret: returnValue,
@@ -49,18 +42,17 @@ process.on('message', (m) => {
 });
 
 
-async function init(rootDir, name) {
+async function init() {
     try {
-        let manifestPath = path.join(rootDir, 'manifest.json');
-        msg('manifestPath: ', manifestPath);
-        msg(manifest);
-        msg('config.root : ' + config.root);
-        msg('manifest.entry : ' + manifest.entry);
+        msg = Msg(`PluginSock for ${config.name}`)
+        msg('initializing pluginSock with config:')
+        console.dir(config);
+
+        manifest = config.manifest;
+        delete config.manifest;
 
         let plugPath = path.join('', config.root, manifest.entry);
-        msg('plugin path: ' + plugPath);
-
-        // Using relative path here
+        msg('Dynamically importing plugin from path: ' + plugPath);
         plugin = await import('./' + plugPath);
         msg('Import complete');
     } catch (e) {
