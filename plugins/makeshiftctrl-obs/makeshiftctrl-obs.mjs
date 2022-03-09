@@ -1,4 +1,4 @@
-import OBSWebSocket from 'obs-websocket-js';
+import ObsWebSocket from 'obs-websocket-js';
 
 const obs = new ObsWebSocket();
 
@@ -31,7 +31,12 @@ const pluginData = {
     try {
         const {
         obsWebSocketVersion,
-        } = await obs.connect('ws://192.168.2.101:4455', 'coffin%20nails', {rpcVersion:1});
+        } = await obs.connect(
+            'ws://192.168.1.121:4455', 
+            '7H2OADyfME4J2ypX', 
+            {
+                rpcVersion:1
+            });
         console.log(`Connected to server ${obsWebSocketVersion}`)
     } catch (error) {
         console.error('Failed to connect', error.code, error.message);
