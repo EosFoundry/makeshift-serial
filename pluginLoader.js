@@ -32,12 +32,12 @@ var Plugin = /** @class */ (function (_super) {
     __extends(Plugin, _super);
     function Plugin(manifest) {
         var _this = _super.call(this) || this;
-        _this.id = manifest.id;
+        _this.id = manifest.name;
         _this.manifest = manifest;
         _this.functionsAvailable = manifest.functionsAvailable;
-        _this.msg = Msg(_this.id);
+        _this.msg = Msg("Plugin object for ".concat(_this.id));
         _this.msg('Creating new event emittor');
-        _this.msg('Forking new pluginSock');
+        _this.msg('Sporking new pluginSock');
         _this.sock = fork('./pluginSock');
         _this.sock.on('message', _this.handleMessage.bind(_this));
         _this.msg('Initializing pluginSock');
@@ -52,20 +52,21 @@ var Plugin = /** @class */ (function (_super) {
         return _this;
     }
     Plugin.prototype.handleMessage = function (m) {
-        msg("message received from: ".concat(this.id, " | Label: ").concat(m.label, " | Data: ").concat(strfy(m.data)));
+        this.msg("Message received from sock --> Label: ".concat(m.label, " | Data: ").concat(strfy(m.data)));
         switch (m.label) {
             case 'status':
                 if (m.data === 'ready') {
-                    this.emit('ready');
+                    _super.prototype.emit.call(this, 'ready');
                 }
                 else if (m.data === 'error loading') {
-                    msg(m.data);
+                    this.msg(m.data);
                 }
                 break;
             case 'data':
                 break;
         }
     };
+    ;
     Plugin.prototype.runFunction = function (name, args) {
         this.sock.send({
             label: 'run',
