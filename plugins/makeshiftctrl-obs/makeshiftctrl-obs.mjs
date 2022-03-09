@@ -1,48 +1,76 @@
-import OBSWebSocket from 'obs-websocket-js';
+import ObsWebSocket from 'obs-websocket-js';
 
-// const OBSWebSocket = require('obs-websocket-js');
-const obs = new OBSWebSocket();
-let connectionObj;
-async function init() {
-    try {
-        connectionObj = await obs.connect(
-            'ws://192.168.1.121:4455',
-            '7H2OADyfME4J2ypX',
-            {
-                rpcVersion: 1
-            }
-        )
-        console.log('toast');
-        console.log(JSON.stringify(connectionObj));
-    } catch (e) {
-        console.log(`erreur ${JSON.stringify(e)}`);
-    }
+const obs = new ObsWebSocket();
+
+const pluginData = {
+    name: 'makeshiftctrl-obs',
+    data: 'OBSWebSocket'
 }
 
-obs.on('Hello', () => {
-    console.log('got hello.');
-})
+  
+    obs.on('Hello', () => {
+        console.log('got hello.')
+    })
 
-obs.on('Identified', () => {
-    console.log('got identified.');
-})
+    obs.on('Identified', () => {
+        console.log('identified.')
+    })
 
-obs.on('ConnectionOpened', () => {
-    console.log(`Success! We're connected & authenticated.`);
-})
+    obs.on('ConnectionOpened', () => {
+        console.log(`Connecting...`);
+    });
 
-obs.on('ConnectionClosed', () => {
-    console.log('connection closed.');
-})
+    obs.on('ConnectionClosed', () => {
+        console.log('Closing...')
+    })
 
-obs.on('error', err => {
-    console.error('socket error:', err);
-});
+    obs.on('error', err => {
+        console.error('socket error:', err);
+    });
 
-init();
+    try {
+        const {
+        obsWebSocketVersion,
+        } = await obs.connect(
+            'ws://192.168.1.121:4455', 
+            '7H2OADyfME4J2ypX', 
+            {
+                rpcVersion:1
+            });
+        console.log(`Connected to server ${obsWebSocketVersion}`)
+    } catch (error) {
+        console.error('Failed to connect', error.code, error.message);
+    };
 
-setTimeout(() => { console.log('done.') }, 4000);
+function CreateScene() {
+    obs.call('CreateScene', {sceneName: 'New Scene'})
+        .then(() => {
+            console.log(`New scene available`);
+        })
+        .catch (err => {
+            console.log(err);
+    });
+}
 
-    // obs.on('ConnectionOpened', () => {
-    //     console.log(`Success! We're connected & authenticated.`);
-    //     })
+function SetCurrentProgramScene() {
+    obs.call('SetCurrentProgramScene', {sceneName: 'visual studio code'});
+
+    obs.on('CurrentProgramSceneChanged', event => {
+        console.log(`Current scene changed to: ${event.sceneName}`);
+    });
+};
+
+
+export {
+    obs,
+    pluginData,
+    CreateScene,
+    SetCurrentProgramScene,
+}
+
+
+
+
+// obs.on('SceneRemoved', event => {
+//     console.log(`Removed scene: ${event.sceneName}`);
+// });

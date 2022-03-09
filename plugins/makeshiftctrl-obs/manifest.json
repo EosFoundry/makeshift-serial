@@ -1,0 +1,10 @@
+{
+    "name": "makeshiftctrl-obs",
+    "entry": "makeshiftctrl-obs.mjs",
+    "functionsAvailable": [
+        "connectServer",
+        "CreateScene",
+        "SetCurrentProgramScene"
+    ],
+    "toaster": "bread"
+}
