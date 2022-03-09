@@ -28,13 +28,17 @@ async function loadPlugins() {
         plugins[pluginName].manifest = manifest;
         console.log(manifest);
     }
-}
-
-loadPlugins().then(() => {
-    console.log('done!')
-    
     for (let id of pluginList) {
         let vm = fork('./pluginVM');
+        vm.on('message', (m:Message) => {
+            console.log('recieved message from plugin: ' + id);
+            console.log(m.data);
+            if (m.data === 'ready') {
+                vm.send({
+                    command: plugins[id].manifest.functionsAvailable[0]
+                })
+            }
+        })
         vm.send({
             name: plugins[id].manifest.name,
             root: './plugins/' + plugins[id].manifest.name,
@@ -42,8 +46,11 @@ loadPlugins().then(() => {
             command: 'init'
         });
     }
+}
 
-});
+type Message = {
+    data: any;
+}
 
 export {
     loadPlugins,

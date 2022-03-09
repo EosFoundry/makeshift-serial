@@ -7,26 +7,32 @@ let config;
 
 
 process.on('message', (m) => {
-    if (m.command === 'init') {
+    let data = m;
+    if (data.command === 'init') {
         config = m;
         manifest = config.manifest;
         delete config.manifest;
         
         console.log('initializing')
-        console.log(m.root);
+        console.log(data.root);
         console.log(config);
-        init(config.root, config.name);
+        init(config.root, config.name).then(() => {
+            process.send({
+                data: 'ready'
+            })
+        }).catch((e) => {
+            process.send({
+                data:'error',
+                error: e
+            })
+        })
+    } else if (manifest.functionsAvailable.includes(data.command)) {
+        console.log('running command')
+        plugin[data.command]();
     }
 })
 
-const pluginData = {
-    dummyData: 'some string',
-    mutable: [
-        'dummyData',
-    ],
-}
-
-async function init ( rootDir , name) {
+async function init (rootDir , name) {
     try {
         let manifestPath = path.join(rootDir, 'manifest.json');
         console.log('manifestPath: ', manifestPath);
@@ -40,7 +46,6 @@ async function init ( rootDir , name) {
         // Using relative path here
         plugin = await import('./' + plugPath);
         console.log(plugin);
-
     } catch (e) {
         console.log(e);
     }

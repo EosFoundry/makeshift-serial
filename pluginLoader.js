@@ -47,12 +47,12 @@ var pluginList = [
 var plugins = {};
 function loadPlugins() {
     return __awaiter(this, void 0, void 0, function () {
-        var _i, pluginList_1, pluginName, data, manifest;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var _i, pluginList_1, pluginName, data, manifest, _loop_1, _a, pluginList_2, id;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0:
                     _i = 0, pluginList_1 = pluginList;
-                    _a.label = 1;
+                    _b.label = 1;
                 case 1:
                     if (!(_i < pluginList_1.length)) return [3 /*break*/, 4];
                     pluginName = pluginList_1[_i];
@@ -60,30 +60,40 @@ function loadPlugins() {
                     console.log('reading manifest from - ' + pluginName);
                     return [4 /*yield*/, readFile(path.join(__plugin_dir, pluginName, 'manifest.json'), { encoding: 'UTF8' })];
                 case 2:
-                    data = _a.sent();
+                    data = _b.sent();
                     manifest = JSON.parse(data);
                     plugins[pluginName].manifest = manifest;
                     console.log(manifest);
-                    _a.label = 3;
+                    _b.label = 3;
                 case 3:
                     _i++;
                     return [3 /*break*/, 1];
-                case 4: return [2 /*return*/];
+                case 4:
+                    _loop_1 = function (id) {
+                        var vm = fork('./pluginVM');
+                        vm.on('message', function (m) {
+                            console.log('recieved message from plugin: ' + id);
+                            console.log(m.data);
+                            if (m.data === 'ready') {
+                                vm.send({
+                                    command: plugins[id].manifest.functionsAvailable[0]
+                                });
+                            }
+                        });
+                        vm.send({
+                            name: plugins[id].manifest.name,
+                            root: './plugins/' + plugins[id].manifest.name,
+                            manifest: plugins[id].manifest,
+                            command: 'init'
+                        });
+                    };
+                    for (_a = 0, pluginList_2 = pluginList; _a < pluginList_2.length; _a++) {
+                        id = pluginList_2[_a];
+                        _loop_1(id);
+                    }
+                    return [2 /*return*/];
             }
         });
     });
 }
-loadPlugins().then(function () {
-    console.log('done!');
-    for (var _i = 0, pluginList_2 = pluginList; _i < pluginList_2.length; _i++) {
-        var id = pluginList_2[_i];
-        var vm = fork('./pluginVM');
-        vm.send({
-            name: plugins[id].manifest.name,
-            root: './plugins/' + plugins[id].manifest.name,
-            manifest: plugins[id].manifest,
-            command: 'init'
-        });
-    }
-});
 export { loadPlugins, };
