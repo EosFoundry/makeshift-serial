@@ -12,8 +12,8 @@ const __dirname = path.dirname(__filename);
 const __plugin_dir = path.join(__dirname, 'plugins');
 
 let pluginList = [
-    "dummyPlugin",
-    // "makeshiftctrl-obs",
+    // "dummyPlugin",
+    "makeshiftctrl-obs",
 ];
 
 let plugins = {};
@@ -58,7 +58,7 @@ class Plugin extends EventEmitter {
         this.functionsAvailable = manifest.functionsAvailable;
         this.msg = Msg(`Plugin object for ${this.id}`);
 
-        this.msg('Creating new event emittor');
+        this.msg('Creating new event emitter');
 
         this.msg('Sporking new pluginSock');
         this.sock = fork('./pluginSock');

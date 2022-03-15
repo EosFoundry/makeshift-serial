@@ -2,9 +2,16 @@
     "name": "makeshiftctrl-obs",
     "entry": "makeshiftctrl-obs.mjs",
     "functionsAvailable": [
-        "connectServer",
+        "CreateProfile",
+        "CreateSceneCollection",
         "CreateScene",
-        "SetCurrentProgramScene"
+        "SetCurrentProgramScene",
+        "CaptureWindow",
+        "CaptureMonitor",
+        "CaptureAudioOutput",
+        "ToggleMute",
+        "AdjustVolume",
+        "Screenshot"
     ],
     "toaster": "bread"
 }
