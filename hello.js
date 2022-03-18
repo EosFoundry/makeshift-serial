@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import { loadPlugins, plugins } from "./pluginLoader.js";
 import { Msg, strfy } from './utils.js'
 
@@ -17,3 +18,16 @@ plugins['makeshiftctrl-obs'].on('ready', function() {
 
 
 // console.log('deletedeletedeletedeletedelet')
+=======
+import { loadPlugins, plugins } from "./pluginLoader.js";
+import { Msg, strfy } from './utils.js'
+const msg = Msg('hello');
+
+// loadPlugins()
+
+loadPlugins()
+plugins['dummyPlugin'].on('ready', function() {
+  // msg(strfy(plugins));
+  plugins['dummyPlugin'].runFunction('log', ['some stuff'])
+})
+>>>>>>> Stashed changes
