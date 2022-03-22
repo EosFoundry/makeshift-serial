@@ -19,18 +19,14 @@ const msg = Msg('MakeShiftSerial');
 
 let inputBuffer:number[] = [];
 let dataTimer:NodeJS.Timer;
-const slipEncoder = new SlipEncoder({
+const SLIP_OPTIONS = {
     ESC: 219,
     END: 192,
     ESC_END: 220,
     ESC_ESC: 221,
-});
-const slipDecoder = new SlipDecoder({
-    ESC: 219,
-    END: 192,
-    ESC_END: 220,
-    ESC_ESC: 221,
-});
+}
+const slipEncoder = new SlipEncoder(SLIP_OPTIONS);
+const slipDecoder = new SlipDecoder(SLIP_OPTIONS);
 
 getPort().then((port) => {
     msg('port connection established')
@@ -38,8 +34,26 @@ getPort().then((port) => {
     slipEncoder.pipe(process.stdout); // node -> console
 
     port.pipe(slipDecoder); // teensy -> decoder
+    let states:boolean[] = [];
     slipDecoder.on('data', (data:Buffer) => {
+        states = [];
         msg(data);
+        const buttonsRaw = data.slice(0,2);
+        const dialsRaw = data.slice(2,6);
+        const bytesToBin = (button:number, bitCounter:number) => {
+            if (bitCounter === 0 ) { return; }
+            if (button % 2) {
+                states.push(true);
+            } else {
+                states.push(false);
+            }
+            bytesToBin(Math.floor(button/2), bitCounter-1);
+        }
+
+        buttonsRaw.forEach((b)=>bytesToBin(b,8), );
+
+        msg(states);
+        msg(dialsRaw);
     }); // decoder -> console
 
 

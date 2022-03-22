@@ -47,25 +47,42 @@ import { Msg, strfy } from './lib/utils.js';
 var msg = Msg('MakeShiftSerial');
 var inputBuffer = [];
 var dataTimer;
-var slipEncoder = new SlipEncoder({
+var SLIP_OPTIONS = {
     ESC: 219,
     END: 192,
     ESC_END: 220,
     ESC_ESC: 221
-});
-var slipDecoder = new SlipDecoder({
-    ESC: 219,
-    END: 192,
-    ESC_END: 220,
-    ESC_ESC: 221
-});
+};
+var slipEncoder = new SlipEncoder(SLIP_OPTIONS);
+var slipDecoder = new SlipDecoder(SLIP_OPTIONS);
 getPort().then(function (port) {
     msg('port connection established');
     slipEncoder.pipe(port); // node -> teensy
     slipEncoder.pipe(process.stdout); // node -> console
     port.pipe(slipDecoder); // teensy -> decoder
+    var states = [];
     slipDecoder.on('data', function (data) {
+        states = [];
         msg(data);
+        var buttonsRaw = data.slice(0, 2);
+        var dialsRaw = data.slice(2, 6);
+        var bytesToBin = function (button, bitCounter) {
+            msg(button);
+            msg(bitCounter);
+            if (bitCounter === 0) {
+                return;
+            }
+            if (button % 2) {
+                states.push(true);
+            }
+            else {
+                states.push(false);
+            }
+            bytesToBin(Math.floor(button / 2), bitCounter - 1);
+        };
+        buttonsRaw.forEach(function (b) { return bytesToBin(b, 8); });
+        msg(states);
+        msg(dialsRaw);
     }); // decoder -> console
 });
 export function getPort() {
