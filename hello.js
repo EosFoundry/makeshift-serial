@@ -11,9 +11,10 @@ plugins['makeshiftctrl-obs'].on('ready', function() {
   // plugins['makeshiftctrl-obs'].runFunction('CaptureAudioOutput')
   plugins['makeshiftctrl-obs'].runFunction('AdjustVolume', [-50]) 
   plugins['makeshiftctrl-obs'].runFunction('Screenshot')
-  
 })
 
 
-
-// console.log('deletedeletedeletedeletedelet')
+plugins['dummyPlugin'].on('ready', function() {
+  // msg(strfy(plugins));
+  plugins['dummyPlugin'].runFunction('log', ['some stuff'])  
+})
