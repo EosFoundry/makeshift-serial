@@ -35,9 +35,9 @@ var Plugin = /** @class */ (function (_super) {
         _this.id = manifest.name;
         _this.manifest = manifest;
         _this.functionsAvailable = manifest.functionsAvailable;
-        _this.msg = Msg(_this.id);
+        _this.msg = Msg("Plugin object for ".concat(_this.id));
         _this.msg('Creating new event emitter');
-        _this.msg('Forking new pluginSock');
+        _this.msg('Sporking new pluginSock');
         _this.sock = fork('./pluginSock');
         _this.sock.on('message', _this.handleMessage.bind(_this));
         _this.msg('Initializing pluginSock');

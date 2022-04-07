@@ -7,7 +7,6 @@ const pluginData = {
     data: 'OBSWebSocket'
 }
 
-
     obs.on('Hello', () => {
         console.log('Got hello.')
     })
@@ -45,31 +44,300 @@ const pluginData = {
 
 
 
-function CreateProfile() {
-    obs.call('CreateProfile', {profileName: 'Streaming'});
-};
 
-function CreateSceneCollection() {
-    obs.call('CreateSceneCollection', {sceneCollectionName: 'Testing'})
+
+// General
+
+function GetVersion() {
+    obs.call('GetVersion')
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    })
 }
 
-function CreateScene() {
-    obs.call('CreateScene', {sceneName: 'New Scene'});
-};
+function GetStats() {
+    obs.call('GetStats')
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    })
+}
 
-function SetCurrentProgramScene() {
-    obs.call('SetCurrentProgramScene', {sceneName: 'New Scene'});
-};
+function BroadcastCustomEvent() {
+    obs.call('BroadcastCustomEvent', {
+        eventData: {
+            detail: {
+                name: 'New Event'
+            }
+        }
+    })
+}
 
-function CaptureWindow() {
-    obs.call('CreateInput', {
-        sceneName: 'New Scene',
-        inputName: 'New Window',
-        inputKind: 'window_capture',
+function CallVendorRequest() {
+    obs.call('CallVendorRequest')
+}
+
+function GetHotkeyList() {
+    obs.call('GetHotkeyList')
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    }).catch((err) => {console.log(err)})
+}
+
+function TriggerHotkeyByName() {
+    obs.call('TriggerHotkeyByName', {
+        hotkeyName: 'OBSBasic.Screenshot'
+    })
+} // fix later
+
+function TriggerHotkeyByKeySequence() {
+    obs.call('TriggerHotkeyByKeySequence', {
+        // ?keyId: '',
+        // ?keyModifiers: '',
+        // ?keyModifiers.shift: '',
+        // ?keyModifiers.control: '',
+        // ?keyModifiers.alt: '',
+        // ?keyModifiers.command: '',
+    })
+}
+
+function Sleep() {
+    obs.call('Sleep', {
+        sleepMillis: '5000'
+    }) 
+}
+
+
+// Config
+
+function GetPersistentData() {
+    obs.call('GetPersistentData', {
+        realm: 'OBS_WEBSOCKET_DATA_REALM_PROFILE',
+        slotName: 'slotName'
+    })
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    }).catch((err) => {console.log(err)})
+}
+
+function SetPersistentData() {
+    obs.call('SetPersistentData', {
+        realm: 'OBS_WEBSOCKET_DATA_REALM_PROFILE',
+        slotName: 'slotName',
+        slotValue: slotValue
+    })
+}
+
+function GetSceneCollectionList() {
+    obs.call('GetSceneCollectionList')
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    }).catch((err) => {console.log(err)})
+}
+
+function SetCurrentSceneCollection() {
+    obs.call('SetCurrentSceneCollection', {
+        sceneCollectionName: 'Scene Collection 1'
+    })
+}
+
+function CreateSceneCollection() {
+    obs.call('CreateSceneCollection', {sceneCollectionName: 'collection0'})
+}
+
+function GetProfileList() {
+    obs.call('GetProfileList')
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    }).catch((err) => {console.log(err)})
+}
+
+function SetCurrentProfile() {
+    obs.call('SetCurrentProfile', {
+        profileName: 'profile0'
+    })
+}
+
+function CreateProfile() {
+    obs.call('CreateProfile', {
+        profileName: 'profile0'
     });
 };
 
-function CaptureMonitor() {
+function RemoveProfile() {
+    obs.call('RemoveProfile', {
+        profileName: 'profile0'
+    })
+}
+
+function GetProfileParameter() {
+    obs.call('GetProfileParameter', {
+        parameterCategory: '',
+        parameterName: '',
+    })
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    }).catch((err) => {console.log(err)})
+}
+
+function SetProfileParameter() {
+    obs.call('SetProfileParameter', {
+        parameterCategory: '',
+        parameterName: '',
+        parameterValue: '',
+    })
+}
+
+function GetVideoSettings() {
+    obs.call('GetVideoSettings')
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    }).catch((err) => {console.log(err)})
+}
+
+function SetVideoSettings() {
+    obs.call('SetVideoSettings', {
+        // ?fpsNumerator: 0,
+        // ?fpsDemoninator: 0,
+        // ?baseWidth: 0,
+        // ?baseHeight: 0,
+        // ?outputWidth: 0,
+        // ?outputHeight: 0,
+    })
+}
+
+function GetStreamServiceSettings() {
+    obs.call('GetStreamServiceSettings')
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    }).catch((err) => {console.log(err)})
+}
+
+function SetStreamServiceSettings() {
+    obs.call('SetStreamServiceSettings', {
+        streamServiceType: '',
+        streamServiceSettings: {
+            // object
+        }
+    })
+}
+
+
+// Sources
+
+function GetSourceActive() {
+    obs.call('GetSourceActive')
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    }).catch((err) => {console.log(err)})
+}
+
+function GetSourceScreenshot() {
+    obs.call('GetSourceScreenshot', {
+        sourceName: 'New Window',
+        imageFormat: 'png'
+    })
+}
+
+function SaveSourceScreenshot() {
+    obs.call('SaveSourceScreenshot', {
+        sourceName: 'New Window',
+        imageFormat: 'png',
+        imageFilePath: 'C:/Users/Michelle/Desktop/screenshot.png'
+    });
+};
+
+
+// Scenes
+
+function GetSceneList() {
+    obs.call('GetSceneList')
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    }).catch((err) => {console.log(err)})
+}
+
+function GetGroupList() {
+    obs.call('GetGroupList')
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    }).catch((err) => {console.log(err)})
+}
+
+function GetCurrentProgramScene() {
+    obs.call('GetCurrentProgramScene')
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    }).catch((err) => {console.log(err)})
+}
+
+function SetCurrentProgramScene() {
+    obs.call('SetCurrentProgramScene', {
+        sceneName: 'New Scene'
+    });
+};
+
+function GetCurrentPreviewScene() {
+    obs.call('GetCurrentPreviewScene')
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    }).catch((err) => {console.log(err)})
+}
+
+function SetCurrentPreviewScene() {
+    obs.call('SetCurrentPreviewScene', {sceneName: 'New Scene'})
+}
+
+function CreateScene(delta) {
+    obs.call('CreateScene', delta);
+};
+
+function RemoveScene(delta) {
+    obs.call('RemoveScene', delta)
+}
+
+function SetSceneName() {
+    obs.call('SetSceneName', {
+        sceneName: 'New Scene',
+        newSceneName: 'New New Scene'
+    })
+}
+
+function GetSceneSceneTransitionOverride() {
+    obs.call('GetSceneSceneTransitionOverride', {sceneName: 'New Scene'})
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    }).catch((err) => {console.log(err)})
+}
+
+function SetSceneSceneTransitionOverride() {
+    obs.call('SetSceneSceneTransitionOverride', {sceneName: 'New Scene'})
+}
+
+
+// Inputs
+
+function GetInputList() {
+    obs.call('GetInputList')
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    }).catch((err) => {console.log(err)})
+}
+
+function GetInputKindList() {
+    obs.call('GetInputKindList')
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    }).catch((err) => {console.log(err)})
+}
+
+function GetSpecialInputs() {
+    obs.call('GetSpecialInputs')
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    }).catch((err) => {console.log(err)})
+}
+
+function CreateInput0() {
     obs.call('CreateInput', {
         sceneName: 'New Scene',
         inputName: 'Monitor 1',
@@ -77,7 +345,7 @@ function CaptureMonitor() {
     });
 };
 
-function CaptureAudioOutput() {
+function CreateInput1() {
     obs.call('CreateInput', {
         sceneName: 'New Scene',
         inputName: 'Spotify Music',
@@ -88,42 +356,361 @@ function CaptureAudioOutput() {
     });
 };
 
-function AddFilterGain() {
-    obs.call('CreateSourceFilter', {
-        sourceName: 'Spotify Music',
-        filterName: 'New Gain Filter',
-        filterKind: 'gain'
+function CreateInput2() {
+    obs.call('CreateInput', {
+        sceneName: 'New Scene',
+        inputName: 'New Window',
+        inputKind: 'window_capture',
     });
 };
 
-function ToggleMute() {
+function RemoveInput() {
+    obs.call('RemoveInput', {
+        inputName: 'Spotify Music'
+    })
+}
+
+function SetInputName() {
+    obs.call('SetInputName', {
+        inputName: 'New Window',
+        newInputName: 'New New Window',
+    })
+}
+
+function GetInputDefaultSettings() {
+    obs.call('GetInputDefaultSettings', {
+        inputKind: 'window_capture'
+    })
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    }).catch((err) => {console.log(err)})
+}
+
+function GetInputSettings() {
+    obs.call('GetInputSettings', {
+        inputName: 'Spotify Music'
+    })
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    }).catch((err) => {console.log(err)})
+}
+
+function SetInputSettings() {
+    obs.call('SetInputSettings', {
+        inputName: '',
+        inputSettings: {
+
+        },
+        // ?overlay: boolean
+    })
+}
+
+function GetInputMute() {
+    obs.call('GetInputMute', {
+        inputName: 'Spotify Music'
+    })
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    }).catch((err) => {console.log(err)})
+}
+
+function SetInputMute() {
+    obs.call('SetInputMute', {
+        inputName: 'Spotify Music'
+    })
+}
+
+function ToggleInputMute() {
     obs.call('ToggleInputMute', {
         inputName: 'Spotify Music',
     });
 };
 
+function GetInputVolume() {
+    obs.call('GetInputVolume', {
+        inputName: 'Spotify Music'
+    })
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    }).catch((err) => {console.log(err)})
+}
+
+function SetInputVolume() {
+    obs.call('SetInputVolume', {
+        inputName: 'Spotify Music',
+        inputVolumeDb: -50
+    })
+}
+
+function GetInputAudioBalance() {
+    obs.call('GetInputAudioBalance', {
+        inputName: 'Spotify Music',
+    })
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    }).catch((err) => {console.log(err)})
+}
+
+function SetInputAudioBalance() {
+    obs.call('SetInputAudioBalance', {
+        inputName: 'Spotify Music',
+        inputAudioBalance: 0.5
+    })
+}
+
+function GetInputAudioSyncOffset() {
+    obs.call('GetInputAudioSyncOffset', {
+        inputName: 'Spotify Music'
+    })
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    }).catch((err) => {console.log(err)})
+}
+
+// function SetInputAudioSyncOffset()
+
+// function GetInputAudioMonitorType()
+
+// function SetInputAudioMonitorType()
+
+// function GetInputAudioTracks()
+
+// function SetInputAudioTracks()
+
+// function GetInputPropertiesListPropertyItems()
+
+// function PressInputPropertiesButton()
+
+
+// Transitions
+
+function GetTransitionKindList() {
+    obs.call('GetTransitionKindList')
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    }).catch((err) => {console.log(err)})
+}
+
+function GetSceneTransitionList() {
+    obs.call('GetSceneTransitionList')
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    }).catch((err) => {console.log(err)})
+}
+
+function GetCurrentSceneTransition() {
+    obs.call('GetCurrentSceneTransition')
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    }).catch((err) => {console.log(err)})
+}
+
+// function SetCurrentSceneTransition()
+
+// function SetCurrentSceneTransitionDuration()
+
+// function SetCurrentSceneTransitionSettings()
+
+// function GetCurrentSceneTransitionCursor()
+
+// function TriggerStudioModeTransition()
+
+
+// Filters
+
+// function GetSourceFilterList()
+
+// function GetSourceFilterDefaultSettings()
+
+function CreateSourceFilter() {
+    obs.call('CreateSourceFilter', {
+        sourceName: 'source1',
+        filterName: 'New Gain Filter',
+        filterKind: 'gain'
+    });
+};
+
+// function RemoveSourceFilter()
+
+// function SetSourceFilterName()
+
+// function GetSourceFilter()
+
+// function SetSourceFilterIndex()
+
+// function SetSourceFilterSettings()
+
+
+// Scene Items
+
+// function GetSceneItemList()
+
+// function GetGroupItemList()
+
+// function GetSceneItemId()
+
+// function CreateSceneItem()
+
+// function RemoveSceneItem()
+
+function DuplicateSceneItem() {
+    obs.call('DuplicateSceneItem', {
+        sceneName: '',
+        sceneItemId: 0,
+        // ?destinationSceneName: ''
+    })
+}
+
+
+// Outputs
+
+// function GetVirtualCamStatus()
+
+
+
+// Stream
+
+function GetStreamStatus() {
+    obs.call('GetStreamStatus')
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    }).catch((err) => {console.log(err)})
+}
+
+
+// Record
+
+function GetRecordStatus() {
+    obs.call('GetRecordStatus')
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    }).catch((err) => {console.log(err)})
+}
+
+
+// Media Inputs
+
+function GetMediaInputStatus() {
+    obs.call('GetMediaInputStatus', {
+        inputName: ''
+    })
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    }).catch((err) => {console.log(err)})
+}
+
+
+// UI
+
+function GetStudioModeEnabled() {
+    obs.call('GetStudioModeEnabled')
+}
+
+
+// Custom
+
+
 function AdjustVolume(delta) {
 
-    obs.call('GetInputVolume', {inputName: 'Spotify Music'})
+    obs.call('GetInputVolume', delta.requestData)
     
     .then((data) => {
 
         obs.call('SetInputVolume', {
             inputName: 'Spotify Music',
-            inputVolumeDb: data.inputVolumeDb + delta
+            inputVolumeDb: data.inputVolumeDb + delta.adjFactor
         });
 
         // db limit -100 to 0
     })
 };
 
-function Screenshot() {
-    obs.call('SaveSourceScreenshot', {
-        sourceName: 'New Window',
-        imageFormat: 'png',
-        imageFilePath: 'C:/Users/Michelle/Desktop/screenshot.png'
-    });
-};
+
+// "Get"
+function Get(delta) {
+    obs.call(delta.funcName, delta.requestData)
+    .then((data) => {
+        console.log(JSON.stringify(data))
+    }).catch((err) => {console.log(err)})
+}
+
+// "Set"
+function Set(delta) {
+    obs.call(`{$setFunc}`, {
+        requestData: ''
+    })
+}
+
+// "Create"
+function Create(delta) {
+    obs.call(`{$createFunc}`, {
+        requestData: ''
+    })
+}
+
+// "Remove"
+function Remove(delta) {
+    obs.call(`{$removeFunc}`, {
+        requestData: ''
+    })
+}
+
+// "Trigger"
+function Trigger(delta) {
+    obs.call(`{$triggerFunc}`, {
+
+    })
+}
+
+// "Toggle"
+function Toggle(delta) {
+    obs.call(`{$toggleFunc}`, {
+
+    })
+}
+
+// "Open"
+function Open(delta) {
+    obs.call(`{$openFunc}`, {
+
+    })
+}
+
+// "Start"
+function Start(delta) {
+    obs.call(`{$startFunc}`, {
+
+    })
+}
+
+// "Stop"
+function Stop(delta) {
+    obs.call(`{$stopFunc}`, {
+
+    })
+}
+
+// "Save"
+function Save(delta) {
+    obs.call(`{$saveFunc}`)
+}
+
+
+
+// UNIQUE FUNCTIONS
+
+    // CallVendorRequest()
+    // Sleep()
+
+    // DuplicateSceneItem()
+
+    // SendStreamCaption()
+
+    // PauseRecord()
+
+    // ResumeRecord()
+
+    // OffsetMediaInputCursor()
 
 
 
@@ -144,38 +731,200 @@ obs.on('SceneRemoved', event => {
 });
 
 
+
+const width = 1920
+const height = 1080
+const iCQ = 100
+
+
+getFunc: [
+    GetVersion,
+    GetStats,
+    GetHotkeyList,
+    GetPersistentData,
+    GetSceneCollectionList,
+    GetProfileList,
+    //etc etc
+]
+
+requestData: [
+
+]
+
+
+
+
+
+
 export {
-    obs,
-    pluginData,
-    CreateProfile,
-    CreateSceneCollection,
+    // obs,
+    // pluginData,
+
+    Get,
+
+    // GetVersion,
+    // GetStats,
+    // BroadcastCustomEvent,
+    // CallVendorRequest,
+    // GetHotkeyList,
+    // TriggerHotkeyByName,
+    // TriggerHotkeyByKeySequence,
+    // Sleep,
+
+    // GetPersistentData,
+    // SetPersistentData,
+    // GetSceneCollectionList,
+    // SetCurrentSceneCollection,
+    // CreateSceneCollection,
+    // GetProfileList,
+    // SetCurrentProfile,
+    // CreateProfile,
+    // RemoveProfile,
+    // GetProfileParameter,
+    // SetProfileParameter,
+    // GetVideoSettings,
+    // SetVideoSettings,
+    // GetStreamServiceSettings,
+    // SetStreamServiceSettings,
+
+    // GetSourceActive,
+    // GetSourceScreenshot,
+    // SaveSourceScreenshot,
+
+    // GetSceneList,
+    // GetGroupList,
+    // GetCurrentProgramScene,
+    // SetCurrentProgramScene,
+    // GetCurrentPreviewScene,
+    // SetCurrentPreviewScene,
     CreateScene,
-    SetCurrentProgramScene,
-    CaptureWindow,
-    CaptureMonitor,
-    CaptureAudioOutput,
-    ToggleMute,
-    AdjustVolume,
-    Screenshot,
+    // RemoveScene,
+    // SetSceneName,
+    // GetSceneSceneTransitionOverride,
+    // SetSceneSceneTransitionOverride,
+
+    // GetInputList,
+    // GetInputKindList,
+    // GetSpecialInputs,
+    // CreateInput0,
+    // CreateInput1,
+    // CreateInput2,
+    // RemoveInput,
+    // SetInputName,
+    // GetInputDefaultSettings,
+    // GetInputSettings,
+    // SetInputSettings,
+    // GetInputMute,
+    // SetInputMute,
+    // ToggleInputMute,
+    // GetInputVolume,
+    // SetInputVolume,
+    // GetInputAudioBalance,
+    // SetInputAudioBalance,
+    // GetInputAudioSyncOffset,
+    // SetInputAudioSyncOffset,
+    // GetInputAudioMonitorType,
+    // SetInputAudioMonitorType,
+    // GetInputAudioTracks,
+    // SetInputAudioTracks,
+    // GetInputPropertiesListPropertyItems,
+    // PressInputPropertiesButton,
+
+    // GetTransitionKindList,
+    // GetSceneTransitionList,
+    // GetCurrentSceneTransition,
+    // SetCurrentSceneTransition,
+    // SetCurrentSceneTransitionDuration,
+    // SetCurrentSceneTransitionSettings,
+    // GetCurrentSceneTransitionCursor,
+    // TriggerStudioModeTransition,
+
+    // GetSourceFilterList,
+    // GetSourceFilterDefaultSettings,
+    // CreateSourceFilter,
+    // RemoveSourceFilter,
+    // SetSourceFilterName,
+    // GetSourceFilter,
+    // SetSourceFilterIndex,
+    // SetSourceFilterSettings,
+
+    // GetSceneItemList,
+    // GetGroupItemList,
+    // GetSceneItemId,
+    // CreateSceneItem,
+    // RemoveSceneItem,
+    // DuplicateSceneItem,
+    // GetSceneItemTransform,
+    // SetSceneItemTransform,
+    // GetSceneItemEnabled,
+    // SetSceneItemEnabled,
+    // GetSceneItemLocked,
+    // SetSceneItemLocked,
+    // GetSceneItemIndex,
+    // SetSceneItemIndex,
+    // GetSceneItemBlendMode,
+    // SetSceneItemBlendMode,
+
+    // GetVirtualCamStatus,
+    // ToggleVirtualCam,
+    // StartVirtualCam,
+    // StopVirtualCam,
+    // GetReplayBufferStatus,
+    // ToggleReplayBuffer,
+    // StartReplayBuffer,
+    // StopReplayBuffer,
+    // SaveReplayBuffer,
+    // GetLastReplayBufferReplay,
+
+    // GetStreamStatus,
+    // ToggleStream,
+    // StartStream,
+    // StopStream,
+    // SendStreamCaption,
+
+    // GetRecordStatus,
+    // ToggleRecord,
+    // StartRecord,
+    // StopRecord,
+    // ToggleRecordPause,
+    // PauseRecord,
+    // ResumeRecord,
+
+    // GetMediaInputStatus,
+    // SetMediaInputCursor,
+    // OffsetMediaInputCursor,
+    // TriggerMediaInputAction,
+
+    // GetStudioModeEnabled,
+    // SetStudioModeEnabled,
+    // OpenInputPropertiesDialog,
+    // OpenInputFiltersDialog,
+    // OpenInputInteractDialog,
+    
+    // AdjustVolume,
 }
 
 setTimeout(() => {
 
-obs.call('GetVersion')
+    // obs.call('GetVersion')
 
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch ((err) => {
-        console.log(err)
-    })
+    //     .then((data) => {
+    //         console.log(JSON.stringify(data))
+    //     }).catch ((err) => {
+    //         console.log(err)
+    //     })
+        
+    // obs.call('GetSceneItemList', {
+    //     sceneName: 'visual studio code'
+    // })
+
+    //     .then((data) => {
+    //         console.log(JSON.stringify(data))
+    //     }).catch ((err) => {
+    //         console.log(err)
+    //     });;
+
     
-obs.call('GetInputKindList')
-
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch ((err) => {
-        console.log(err)
-    });;
 
 //     obs.call('GetInputSettings', {inputName: 'Spotify Music'})
 

@@ -26,7 +26,7 @@ process.on('message', (m) => {
 
         case 'run':
             let func = m.data;
-            msg(`Recieved 'run' message with function data: ${func}`);
+            msg(`Received 'run' message with function data: ${func}`);
             if (manifest.functionsAvailable.includes(func.name)) {
                 runFunc(func).then((returnValue) => sendFunctionReturn({
                     name: func.name,
@@ -76,6 +76,8 @@ function sendFunctionReturn(r) {
         },
     })
 }
+
+// function runner
 
 async function runFunc(func) {
     msg(`got function object: ${strfy(func)}`)
