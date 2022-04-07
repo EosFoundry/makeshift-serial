@@ -1,6 +1,6 @@
 import path from 'path';
-import { Message, sendMessage } from './messages'
-import { Msg, strfy } from './utils'
+import { Message, sendMessage } from './messages.js'
+import { Msg, strfy } from './utils.js'
 let msg: Function;
 let plugin;
 let manifest;
@@ -61,7 +61,7 @@ async function init() {
 
     let plugPath = path.join('', config.root, manifest.entry);
     msg('Dynamically importing plugin from path: ' + plugPath);
-    plugin = await import('./' + plugPath);
+    plugin = await import('../' + plugPath);
     msg('Import complete');
   } catch (e) {
     msg(e);

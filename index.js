@@ -67,8 +67,6 @@ getPort().then(function (port) {
         var buttonsRaw = data.slice(0, 2);
         var dialsRaw = data.slice(2, 6);
         var bytesToBin = function (button, bitCounter) {
-            msg(button);
-            msg(bitCounter);
             if (bitCounter === 0) {
                 return;
             }

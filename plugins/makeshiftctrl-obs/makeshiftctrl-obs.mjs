@@ -288,7 +288,9 @@ function SetCurrentPreviewScene() {
 }
 
 function CreateScene(delta) {
-    obs.call('CreateScene', delta);
+    console.log('pls')
+    console.log(delta)
+    obs.call('CreateScene', delta)
 };
 
 function RemoveScene(delta) {

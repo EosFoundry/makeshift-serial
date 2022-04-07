@@ -1,5 +1,5 @@
-import { loadPlugins, plugins } from "./pluginLoader.js";
-import { Msg, strfy } from './utils.js'
+import { loadPlugins, plugins } from "./lib/pluginLoader.js";
+import { Msg, strfy } from './lib/utils.js'
 
 const msg = Msg('hello');
 
@@ -10,6 +10,8 @@ plugins['makeshiftctrl-obs'].on('ready', function() {
   plugins['makeshiftctrl-obs'].runFunction('CreateScene', {
     sceneName: 'New Scene'
   })
+
+  plugins['makeshiftctrl-obs'].runFunction('CreateScene')
 
   // setTimeout(() => {
   //   plugins['makeshiftctrl-obs'].runFunction('RemoveScene', {
