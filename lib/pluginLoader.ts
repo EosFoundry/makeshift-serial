@@ -1,11 +1,13 @@
 import { ChildProcess, fork } from 'child_process'
-import { readFile } from 'fs/promises';
-import { fileURLToPath } from 'url';
-import path from 'path'
-import { Msg, strfy } from './utils.js'
 import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
 import EventEmitter from 'events';
-const msg = Msg('pluginLoader');
+import path from 'path'
+
+import { Msg, strfy } from './utils'
+const msg = Msg('PluginLoader');
+
+import { Message, sendMessage } from './messages'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -65,6 +67,7 @@ class Plugin extends EventEmitter {
         this.sock.on('message', this.handleMessage.bind(this))
 
         this.msg('Initializing pluginSock');
+        sendMessage(this.sock, 'init')
         this.sock.send({
             label: 'init',
             data: {
@@ -91,11 +94,6 @@ function loadPlugins() {
     }
 }
 
-
-type Message = {
-    label: string,
-    data: any,
-}
 
 export {
     loadPlugins,
