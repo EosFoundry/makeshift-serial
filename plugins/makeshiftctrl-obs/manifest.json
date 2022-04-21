@@ -3,7 +3,8 @@
     "entry": "makeshiftctrl-obs.mjs",
     "functionsAvailable": [
         
-        "Get",
+        "RunObs",
+        "AdjustVolume",
         
         "GetVersion",
         "GetStats",
@@ -140,10 +141,121 @@
         "SetStudioModeEnabled",
         "OpenInputPropertiesDialog",
         "OpenInputFiltersDialog",
-        "OpenInputInteractDialog",
-
-        "AdjustVolume"
+        "OpenInputInteractDialog"
         
     ],
+    "requestFields": {
+        
+        "generalReq": {
+            "eventData": {
+                "detail": {
+                    "name": ""
+                }
+            },
+            "vendorName": "",
+            "requestType": "",
+            "requestData": "",
+            "hotkeyName": "",
+            "keyId": "",
+            "keyModifiers": "",
+            "keyModifiers.shift": "",
+            "keyModifiers.control": "",
+            "keyModifiers.alt": "",
+            "keyModifiers.command": "",
+            "sleepMillis": ""
+          },
+        
+        "configReq": {
+            "realm": "",
+            "slotName": "",
+            "slotValue": "",
+            "sceneCollectionName": "",
+            "profileName": "",
+            "parameterCategory":"",
+            "parameterName":"",
+            "parameterValue":"",
+            "fpsNumerator":"",
+            "fpsDemoninator":"",
+            "baseWidth":"",
+            "baseHeight":"",
+            "outputWidth":"",
+            "outputHeight":"", 
+            "streamServiceType":"",
+            "streamServiceSettings":""
+        },
+
+        "sourcesReq": {
+            "sourceName": "",
+            "imageFormat": "",
+            "imageWidth": "",
+            "imageHeigh": "",
+            "imageCompressionQuality": ""
+        },
+
+        "scenesReq": {
+            "sceneName": "",
+            "newSceneName": "",
+            "transitionName": "",
+            "transitionDuration": ""
+        },
+
+        "inputsReq": {
+            "sceneName": "",
+            "inputName": "",
+            "inputKind": "",
+            "inputSettings": {},
+            "sceneItemEnabled": 1,
+            "newInputName": "",
+            "inputMuted": "",
+            "inputVolumeMul": "",
+            "inputVolumeDb": "",
+            "inputAudioBalance": "",
+            "inputAudioSyncOffset": "",
+            "monitorType": "",
+            "propertyName": "",
+            "transitionName": "",
+            "transitionDuration": "",
+            "transitionSettings": {}
+        },
+
+        "filtersReq": {
+            "sourceName": "",
+            "filterName": "",
+            "filterKind": "",
+            "filterSettings": {},
+            "newFilterName": "",
+            "filterIndex": "",
+            "filterEnabled": 1
+        },
+
+        "sceneItemsReq": {
+            "sceneName": "",
+            "sourceName": "",
+            "sceneItemEnabled": 1,
+            "sceneItemId": "",
+            "destinationSceneName": "",
+            "sceneItemTransform": {},
+            "sceneItemLocked": 1,
+            "sceneItemIndex": "",
+            "sceneItemBlendMode": ""
+        },
+
+        "outputsReq": {
+            "captionText": ""
+        },
+
+        "mediaInputsReq": {
+            "inputName": "",
+            "mediaCursor": "",
+            "mediaAction": ""
+        },
+
+        "uiReq": {
+            "studioModeEnabled": 1,
+            "inputName": ""
+        }
+
+    },
+
     "toaster": "bread"
 }

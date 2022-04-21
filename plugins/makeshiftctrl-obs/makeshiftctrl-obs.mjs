@@ -288,8 +288,6 @@ function SetCurrentPreviewScene() {
 }
 
 function CreateScene(delta) {
-    console.log('pls')
-    console.log(delta)
     obs.call('CreateScene', delta)
 };
 
@@ -609,17 +607,17 @@ function GetStudioModeEnabled() {
 }
 
 
-// Custom
+        // All the functions above are obsolete & for testing purposes only
 
 
 function AdjustVolume(delta) {
 
-    obs.call('GetInputVolume', delta.requestData)
+    obs.call('GetInputVolume', delta.requestField)
     
     .then((data) => {
 
         obs.call('SetInputVolume', {
-            inputName: 'Spotify Music',
+            inputName: data.inputName,
             inputVolumeDb: data.inputVolumeDb + delta.adjFactor
         });
 
@@ -628,75 +626,33 @@ function AdjustVolume(delta) {
 };
 
 
-// "Get"
-function Get(delta) {
-    obs.call(delta.funcName, delta.requestData)
+
+function RunObs(delta) {
+    obs.call(delta.functionName, delta.requestField)
     .then((data) => {
         console.log(JSON.stringify(data))
     }).catch((err) => {console.log(err)})
 }
 
+// "Get"
+
 // "Set"
-function Set(delta) {
-    obs.call(`{$setFunc}`, {
-        requestData: ''
-    })
-}
 
 // "Create"
-function Create(delta) {
-    obs.call(`{$createFunc}`, {
-        requestData: ''
-    })
-}
 
 // "Remove"
-function Remove(delta) {
-    obs.call(`{$removeFunc}`, {
-        requestData: ''
-    })
-}
 
 // "Trigger"
-function Trigger(delta) {
-    obs.call(`{$triggerFunc}`, {
-
-    })
-}
 
 // "Toggle"
-function Toggle(delta) {
-    obs.call(`{$toggleFunc}`, {
-
-    })
-}
 
 // "Open"
-function Open(delta) {
-    obs.call(`{$openFunc}`, {
-
-    })
-}
 
 // "Start"
-function Start(delta) {
-    obs.call(`{$startFunc}`, {
-
-    })
-}
 
 // "Stop"
-function Stop(delta) {
-    obs.call(`{$stopFunc}`, {
-
-    })
-}
 
 // "Save"
-function Save(delta) {
-    obs.call(`{$saveFunc}`)
-}
-
 
 
 // UNIQUE FUNCTIONS
@@ -734,35 +690,12 @@ obs.on('SceneRemoved', event => {
 
 
 
-const width = 1920
-const height = 1080
-const iCQ = 100
-
-
-getFunc: [
-    GetVersion,
-    GetStats,
-    GetHotkeyList,
-    GetPersistentData,
-    GetSceneCollectionList,
-    GetProfileList,
-    //etc etc
-]
-
-requestData: [
-
-]
-
-
-
-
-
 
 export {
     // obs,
     // pluginData,
 
-    Get,
+    RunObs,
 
     // GetVersion,
     // GetStats,
@@ -799,7 +732,7 @@ export {
     // SetCurrentProgramScene,
     // GetCurrentPreviewScene,
     // SetCurrentPreviewScene,
-    CreateScene,
+    // CreateScene,
     // RemoveScene,
     // SetSceneName,
     // GetSceneSceneTransitionOverride,
@@ -926,33 +859,5 @@ setTimeout(() => {
     //         console.log(err)
     //     });;
 
-    
-
-//     obs.call('GetInputSettings', {inputName: 'Spotify Music'})
-
-//     .then((data) => {
-//         console.log('input settings: ' + JSON.stringify(data))
-//     }).catch ((err) => {
-//         console.log(err)
-//     })
-
-//     obs.call('GetInputVolume', {inputName: 'Spotify Music'})
-
-//     .then((data) => {
-//         console.log('input settings: ' + JSON.stringify(data))
-//     }).catch ((err) => {
-//         console.log(err)
-//     })
-
-//     obs.call('GetSourceFilter', {
-//         sourceName: 'New Window',
-//         filterName: 'Scroll',
-//     })
-
-//     .then((data) => {
-//         console.log('filter list: ' + JSON.stringify(data))
-//     }).catch ((err) => {
-//         console.log(err)
-//     })
 
 }, 1000)

@@ -43,7 +43,7 @@ class Plugin extends EventEmitter {
 
     };
 
-    runFunction (name: string, args?:string[]): void {
+    runFunction (name: string, args?:any[]): void {
         this.sock.send({
             label: 'run',
             data: {
