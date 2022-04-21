@@ -4,14 +4,14 @@ import { fileURLToPath } from 'url';
 import EventEmitter from 'events';
 import path from 'path'
 
-import { Msg, strfy } from './utils'
+import { Msg, strfy } from './utils.js'
 const msg = Msg('PluginLoader');
 
-import { Message, sendMessage } from './messages'
+import { Message, sendMessage } from './messages.js'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const __plugin_dir = path.join(__dirname, 'plugins');
+const __plugin_dir = path.join(__dirname, '../plugins');
 
 let pluginList = [
     // "dummyPlugin",
@@ -43,7 +43,7 @@ class Plugin extends EventEmitter {
 
     };
 
-    runFunction (name: string, args?:string[]): void {
+    runFunction (name: string, args?:any[]): void {
         this.sock.send({
             label: 'run',
             data: {
@@ -63,7 +63,7 @@ class Plugin extends EventEmitter {
         this.msg('Creating new event emitter');
 
         this.msg('Sporking new pluginSock');
-        this.sock = fork('./pluginSock');
+        this.sock = fork('./lib/pluginSock.js');
         this.sock.on('message', this.handleMessage.bind(this))
 
         this.msg('Initializing pluginSock');

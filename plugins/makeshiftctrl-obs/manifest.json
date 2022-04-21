@@ -2,16 +2,260 @@
     "name": "makeshiftctrl-obs",
     "entry": "makeshiftctrl-obs.mjs",
     "functionsAvailable": [
-        "CreateProfile",
-        "CreateSceneCollection",
-        "CreateScene",
-        "SetCurrentProgramScene",
-        "CaptureWindow",
-        "CaptureMonitor",
-        "CaptureAudioOutput",
-        "ToggleMute",
+        
+        "RunObs",
         "AdjustVolume",
-        "Screenshot"
+        
+        "GetVersion",
+        "GetStats",
+        "BroadcastCustomEvent",
+        "CallVendorRequest",
+        "GetHotkeyList",
+        "TriggerHotkeyByName",
+        "TriggerHotkeyByKeySequence",
+        "Sleep",
+
+        "GetPersistentData",
+        "SetPersistentData",
+        "GetSceneCollectionList",
+        "SetCurrentSceneCollection",
+        "CreateSceneCollection",
+        "GetProfileList",
+        "SetCurrentProfile",
+        "CreateProfile",
+        "RemoveProfile",
+        "GetProfileParameter",
+        "SetProfileParameter",
+        "GetVideoSettings",
+        "SetVideoSettings",
+        "GetStreamServiceSettings",
+        "SetStreamServiceSettings",
+
+        "GetSourceActive",
+        "GetSourceScreenshot",
+        "SaveSourceScreenshot",
+
+        "GetSceneList",
+        "GetGroupList",
+        "GetCurrentProgramScene",
+        "SetCurrentProgramScene",
+        "GetCurrentPreviewScene",
+        "SetCurrentPreviewScene",
+        "CreateScene",
+        "RemoveScene",
+        "SetSceneName",
+        "GetSceneSceneTransitionOverride",
+        "SetSceneSceneTransitionOverride",
+
+        "GetInputList",
+        "GetInputKindList",
+        "GetSpecialInputs",
+        "CreateInput",
+        "RemoveInput",
+        "SetInputName",
+        "GetInputDefaultSettings",
+        "GetInputSettings",
+        "SetInputSettings",
+        "GetInputMute",
+        "SetInputMute",
+        "ToggleInputMute",
+        "GetInputVolume",
+        "SetInputVolume",
+        "GetInputAudioBalance",
+        "SetInputAudioBalance",
+        "GetInputAudioSyncOffset",
+        "SetInputAudioSyncOffset",
+        "GetInputAudioMonitorType",
+        "SetInputAudioMonitorType",
+        "GetInputAudioTracks",
+        "SetInputAudioTracks",
+        "GetInputPropertiesListPropertyItems",
+        "PressInputPropertiesButton",
+  
+        "GetTransitionKindList",
+        "GetSceneTransitionList",
+        "GetCurrentSceneTransition",
+        "SetCurrentSceneTransition",
+        "SetCurrentSceneTransitionDuration",
+        "SetCurrentSceneTransitionSettings",
+        "GetCurrentSceneTransitionCursor",
+        "TriggerStudioModeTransition",
+
+        "GetSourceFilterList",
+        "GetSourceFilterDefaultSettings",
+        "CreateSourceFilter",
+        "RemoveSourceFilter",
+        "SetSourceFilterName",
+        "GetSourceFilter",
+        "SetSourceFilterIndex",
+        "SetSourceFilterSettings",
+
+        "GetSceneItemList",
+        "GetGroupItemList",
+        "GetSceneItemId",
+        "CreateSceneItem",
+        "RemoveSceneItem",
+        "DuplicateSceneItem",
+        "GetSceneItemTransform",
+        "SetSceneItemTransform",
+        "GetSceneItemEnabled",
+        "SetSceneItemEnabled",
+        "GetSceneItemLocked",
+        "SetSceneItemLocked",
+        "GetSceneItemIndex",
+        "SetSceneItemIndex",
+        "GetSceneItemBlendMode",
+        "SetSceneItemBlendMode",
+  
+        "GetVirtualCamStatus",
+        "ToggleVirtualCam",
+        "StartVirtualCam",
+        "StopVirtualCam",
+        "GetReplayBufferStatus",
+        "ToggleReplayBuffer",
+        "StartReplayBuffer",
+        "StopReplayBuffer",
+        "SaveReplayBuffer",
+        "GetLastReplayBufferReplay",
+ 
+        "GetStreamStatus",
+        "ToggleStream",
+        "StartStream",
+        "StopStream",
+        "SendStreamCaption",
+
+        "GetRecordStatus",
+        "ToggleRecord",
+        "StartRecord",
+        "StopRecord",
+        "ToggleRecordPause",
+        "PauseRecord",
+        "ResumeRecord",
+ 
+        "GetMediaInputStatus",
+        "SetMediaInputCursor",
+        "OffsetMediaInputCursor",
+        "TriggerMediaInputAction",
+    
+        "GetStudioModeEnabled",
+        "SetStudioModeEnabled",
+        "OpenInputPropertiesDialog",
+        "OpenInputFiltersDialog",
+        "OpenInputInteractDialog"
+        
     ],
+    "requestFields": {
+        
+        "generalReq": {
+            "eventData": {
+                "detail": {
+                    "name": ""
+                }
+            },
+            "vendorName": "",
+            "requestType": "",
+            "requestData": "",
+            "hotkeyName": "",
+            "keyId": "",
+            "keyModifiers": "",
+            "keyModifiers.shift": "",
+            "keyModifiers.control": "",
+            "keyModifiers.alt": "",
+            "keyModifiers.command": "",
+            "sleepMillis": ""
+          },
+        
+        "configReq": {
+            "realm": "",
+            "slotName": "",
+            "slotValue": "",
+            "sceneCollectionName": "",
+            "profileName": "",
+            "parameterCategory":"",
+            "parameterName":"",
+            "parameterValue":"",
+            "fpsNumerator":"",
+            "fpsDemoninator":"",
+            "baseWidth":"",
+            "baseHeight":"",
+            "outputWidth":"",
+            "outputHeight":"", 
+            "streamServiceType":"",
+            "streamServiceSettings":""
+        },
+
+        "sourcesReq": {
+            "sourceName": "",
+            "imageFormat": "",
+            "imageWidth": "",
+            "imageHeigh": "",
+            "imageCompressionQuality": ""
+        },
+
+        "scenesReq": {
+            "sceneName": "",
+            "newSceneName": "",
+            "transitionName": "",
+            "transitionDuration": ""
+        },
+
+        "inputsReq": {
+            "sceneName": "",
+            "inputName": "",
+            "inputKind": "",
+            "inputSettings": {},
+            "sceneItemEnabled": 1,
+            "newInputName": "",
+            "inputMuted": "",
+            "inputVolumeMul": "",
+            "inputVolumeDb": "",
+            "inputAudioBalance": "",
+            "inputAudioSyncOffset": "",
+            "monitorType": "",
+            "propertyName": "",
+            "transitionName": "",
+            "transitionDuration": "",
+            "transitionSettings": {}
+        },
+
+        "filtersReq": {
+            "sourceName": "",
+            "filterName": "",
+            "filterKind": "",
+            "filterSettings": {},
+            "newFilterName": "",
+            "filterIndex": "",
+            "filterEnabled": 1
+        },
+
+        "sceneItemsReq": {
+            "sceneName": "",
+            "sourceName": "",
+            "sceneItemEnabled": 1,
+            "sceneItemId": "",
+            "destinationSceneName": "",
+            "sceneItemTransform": {},
+            "sceneItemLocked": 1,
+            "sceneItemIndex": "",
+            "sceneItemBlendMode": ""
+        },
+
+        "outputsReq": {
+            "captionText": ""
+        },
+
+        "mediaInputsReq": {
+            "inputName": "",
+            "mediaCursor": "",
+            "mediaAction": ""
+        },
+
+        "uiReq": {
+            "studioModeEnabled": 1,
+            "inputName": ""
+        }
+
+    },
+
     "toaster": "bread"
 }
