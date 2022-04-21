@@ -25,6 +25,10 @@ process.on('message', (m: Message) => {
       }).catch((e) => sendMessage(process, 'error', e))
       break;
 
+    // TODO: get call working
+    case 'call':
+      plugin.call(m.data.header, m.data.body);
+
     case 'run':
       let func = m.data;
       msg(`Recieved 'run' message with function data: ${func}`);
