@@ -44,8 +44,12 @@ class Plugin extends EventEmitter {
     };
 
     // TODO: get call working
-    callFunction (name: string, message?:any[]): void {
-        this.send('call', { data: message })
+
+    callFunction (name: string, message?:any): void {
+        this.send('call', {
+            name: name,
+            args: message ? message : {}
+        })
     }
 
     send(label: string, data: any): void {

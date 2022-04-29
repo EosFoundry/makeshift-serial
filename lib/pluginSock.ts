@@ -1,4 +1,5 @@
 import path from 'path';
+import { send } from 'process';
 import { Message, sendMessage } from './messages.js'
 import { Msg, strfy } from './utils.js'
 let msg: Function;
@@ -27,7 +28,31 @@ process.on('message', (m: Message) => {
 
     // TODO: get call working
     case 'call':
-      plugin.call(m.data.header, m.data.body);
+      // try {
+        plugin.RunObs(m.data.name, m.data.args);
+        msg(`Got 'call' message with function data: ${strfy(m.data)}`);
+      // } catch (e) {
+      //   sendMessage(process, 'error', e);
+      //   msg(`Sock error: ${e}`)
+      // }
+      break;
+
+    // if (manifest.functionsAvailable.includes(m.data.name)) {
+    //   runAsAsync(m.data)
+    //     .then((returnValue) =>
+    //       sendMessage(
+    //           process,
+    //           'function-return',
+    //           {
+    //             name: m.data.name,
+    //           }
+    //       )
+    //     ).catch((e) => sendMessage(process, 'error', e));
+    // } else {
+    //   let emessage = `Could not find function with name: ${m.data.name} in plugin`;
+    //   msg(emessage);
+    //   sendMessage(process, 'error', emessage);
+    // }
 
     case 'run':
       let func = m.data;
