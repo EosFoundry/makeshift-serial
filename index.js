@@ -63,7 +63,7 @@ getPort().then(function (port) {
     var states = [];
     slipDecoder.on('data', function (data) {
         states = [];
-        msg(data);
+        msg("Data: ".concat(data));
         var buttonsRaw = data.slice(0, 2);
         var dialsRaw = data.slice(2, 6);
         var bytesToBin = function (button, bitCounter) {
@@ -79,8 +79,8 @@ getPort().then(function (port) {
             bytesToBin(Math.floor(button / 2), bitCounter - 1);
         };
         buttonsRaw.forEach(function (b) { return bytesToBin(b, 8); });
-        msg(states);
-        msg(dialsRaw);
+        // msg(`States: ${states}`);
+        // msg(dialsRaw);
     }); // decoder -> console
 });
 export function getPort() {

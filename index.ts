@@ -28,38 +28,63 @@ const SLIP_OPTIONS = {
 const slipEncoder = new SlipEncoder(SLIP_OPTIONS);
 const slipDecoder = new SlipDecoder(SLIP_OPTIONS);
 
-getPort().then((port) => {
-    msg('port connection established')
+slipDecoder.on('data', (data: Buffer) => {
+    const header = data.slice(0, 1).at(0);
+    const body = data.slice(1,19);
+    msg(`Header: `)
+    msg(header)
+    switch (header) {
+        case 0:
+            msg(`Got init message from MakeShift`);
+            break;
+        case 1:
+            msg(`Got state update from MakeShift`);
+            handleStateUpdate(body);
+            break;
+        default:
+            msg(`Got undefined header state: ${header}`);
+            break;
+    }
+    }); // decoder -> console
+
+try {
+    let port = await getPort();
+    msg('port connection established');
     slipEncoder.pipe(port); // node -> teensy
     slipEncoder.pipe(process.stdout); // node -> console
 
     port.pipe(slipDecoder); // teensy -> decoder
-    let states:boolean[] = [];
-    slipDecoder.on('data', (data:Buffer) => {
-        states = [];
-        msg(data);
-        const buttonsRaw = data.slice(0,2);
-        const dialsRaw = data.slice(2,6);
-        const bytesToBin = (button:number, bitCounter:number) => {
-            if (bitCounter === 0 ) { return; }
-            if (button % 2) {
-                states.push(true);
-            } else {
-                states.push(false);
-            }
-            bytesToBin(Math.floor(button/2), bitCounter-1);
+} catch (e) {
+    msg(e);
+}
+
+function handleStateUpdate(data:Buffer) {
+    let states: boolean[] = [];
+    const buttonsRaw = data.slice(0, 2).reverse();
+    const dialsRaw = data.slice(2, 18);
+    const bytesToBin = (button: number, bitCounter: number) => {
+        if (bitCounter === 0) { return; }
+        if (button % 2) {
+            states.push(true);
+        } else {
+            states.push(false);
         }
+        bytesToBin(Math.floor(button / 2), bitCounter - 1);
+    }
+    buttonsRaw.forEach((b) => bytesToBin(b, 8),);
 
-        buttonsRaw.forEach((b)=>bytesToBin(b,8), );
+    let dials: number[] = [];
+    dials.push(dialsRaw.readInt32BE(0));
+    dials.push(dialsRaw.readInt32BE(4));
+    dials.push(dialsRaw.readInt32BE(8));
+    dials.push(dialsRaw.readInt32BE(12));
 
-        msg(states);
-        msg(dialsRaw);
-    }); // decoder -> console
+    msg(`Buttons: ${states}`);
+    msg(`Dials:`);
+    msg(dials);
+}
 
-
-})
-
-export async function getPort() {
+async function getPort() {
     try {
         const portList = await SerialPort.list();
 
@@ -72,11 +97,10 @@ export async function getPort() {
 
         msg(`Found ports: ${strfy(makeShiftPortInfo)}`)
 
-        const makeShiftPort = new SerialPort({
+        return new SerialPort({
             path: makeShiftPortInfo[0].path,
             baudRate: 9600
         });
-        return makeShiftPort;
     } catch (e) {
         msg(e);
     }
