@@ -7,40 +7,40 @@ const pluginData = {
     data: 'OBSWebSocket'
 }
 
-    obs.on('Hello', () => {
-        console.log('Got hello.')
-    })
+obs.on('Hello', () => {
+    console.log('Got hello.')
+})
 
-    obs.on('Identified', () => {
-        console.log('Identified.')
-    })
+obs.on('Identified', () => {
+    console.log('Identified.')
+})
 
-    obs.on('ConnectionOpened', () => {
-        console.log(`Connecting...`);
-    });
+obs.on('ConnectionOpened', () => {
+    console.log(`Connecting...`);
+});
 
-    obs.on('ConnectionClosed', () => {
-        console.log('Closing...')
-    })
+obs.on('ConnectionClosed', () => {
+    console.log('Closing...')
+})
 
-    obs.on('error', err => {
-        console.error('Socket error:', err);
-    });
+obs.on('error', err => {
+    console.error('Socket error:', err);
+});
 
 
-    try {
-        const {
+try {
+    const {
         obsWebSocketVersion,
-        } = await obs.connect(
-            'ws://192.168.2.101:4455', 
-            'Cz9oWxO5t05jiXlI', 
-            {
-                rpcVersion:1
-            });
-        console.log(`Connected to server ${obsWebSocketVersion}`)
-    } catch (error) {
-        console.error('Failed to connect', error.code, error.message);
-    };
+    } = await obs.connect(
+        'ws://192.168.2.101:4455',
+        'Cz9oWxO5t05jiXlI',
+        {
+            rpcVersion: 1
+        });
+    console.log(`Connected to server ${obsWebSocketVersion}`)
+} catch (error) {
+    console.error('Failed to connect', error.code, error.message);
+};
 
 
 
@@ -50,16 +50,16 @@ const pluginData = {
 
 function GetVersion() {
     obs.call('GetVersion')
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    })
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        })
 }
 
 function GetStats() {
     obs.call('GetStats')
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    })
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        })
 }
 
 function BroadcastCustomEvent() {
@@ -78,16 +78,16 @@ function CallVendorRequest() {
 
 function GetHotkeyList() {
     obs.call('GetHotkeyList')
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch((err) => {console.log(err)})
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        }).catch((err) => { console.log(err) })
 }
 
 function TriggerHotkeyByName() {
     obs.call('TriggerHotkeyByName', {
         hotkeyName: 'OBSBasic.Screenshot'
     })
-} // fix later
+}
 
 function TriggerHotkeyByKeySequence() {
     obs.call('TriggerHotkeyByKeySequence', {
@@ -103,7 +103,7 @@ function TriggerHotkeyByKeySequence() {
 function Sleep() {
     obs.call('Sleep', {
         sleepMillis: '5000'
-    }) 
+    })
 }
 
 
@@ -114,9 +114,9 @@ function GetPersistentData() {
         realm: 'OBS_WEBSOCKET_DATA_REALM_PROFILE',
         slotName: 'slotName'
     })
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch((err) => {console.log(err)})
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        }).catch((err) => { console.log(err) })
 }
 
 function SetPersistentData() {
@@ -129,9 +129,9 @@ function SetPersistentData() {
 
 function GetSceneCollectionList() {
     obs.call('GetSceneCollectionList')
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch((err) => {console.log(err)})
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        }).catch((err) => { console.log(err) })
 }
 
 function SetCurrentSceneCollection() {
@@ -141,14 +141,14 @@ function SetCurrentSceneCollection() {
 }
 
 function CreateSceneCollection() {
-    obs.call('CreateSceneCollection', {sceneCollectionName: 'collection0'})
+    obs.call('CreateSceneCollection', { sceneCollectionName: 'collection0' })
 }
 
 function GetProfileList() {
     obs.call('GetProfileList')
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch((err) => {console.log(err)})
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        }).catch((err) => { console.log(err) })
 }
 
 function SetCurrentProfile() {
@@ -174,9 +174,9 @@ function GetProfileParameter() {
         parameterCategory: '',
         parameterName: '',
     })
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch((err) => {console.log(err)})
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        }).catch((err) => { console.log(err) })
 }
 
 function SetProfileParameter() {
@@ -189,9 +189,9 @@ function SetProfileParameter() {
 
 function GetVideoSettings() {
     obs.call('GetVideoSettings')
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch((err) => {console.log(err)})
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        }).catch((err) => { console.log(err) })
 }
 
 function SetVideoSettings() {
@@ -207,9 +207,9 @@ function SetVideoSettings() {
 
 function GetStreamServiceSettings() {
     obs.call('GetStreamServiceSettings')
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch((err) => {console.log(err)})
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        }).catch((err) => { console.log(err) })
 }
 
 function SetStreamServiceSettings() {
@@ -226,9 +226,9 @@ function SetStreamServiceSettings() {
 
 function GetSourceActive() {
     obs.call('GetSourceActive')
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch((err) => {console.log(err)})
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        }).catch((err) => { console.log(err) })
 }
 
 function GetSourceScreenshot() {
@@ -251,23 +251,23 @@ function SaveSourceScreenshot() {
 
 function GetSceneList() {
     obs.call('GetSceneList')
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch((err) => {console.log(err)})
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        }).catch((err) => { console.log(err) })
 }
 
 function GetGroupList() {
     obs.call('GetGroupList')
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch((err) => {console.log(err)})
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        }).catch((err) => { console.log(err) })
 }
 
 function GetCurrentProgramScene() {
     obs.call('GetCurrentProgramScene')
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch((err) => {console.log(err)})
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        }).catch((err) => { console.log(err) })
 }
 
 function SetCurrentProgramScene() {
@@ -278,13 +278,13 @@ function SetCurrentProgramScene() {
 
 function GetCurrentPreviewScene() {
     obs.call('GetCurrentPreviewScene')
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch((err) => {console.log(err)})
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        }).catch((err) => { console.log(err) })
 }
 
 function SetCurrentPreviewScene() {
-    obs.call('SetCurrentPreviewScene', {sceneName: 'New Scene'})
+    obs.call('SetCurrentPreviewScene', { sceneName: 'New Scene' })
 }
 
 function CreateScene(delta) {
@@ -303,14 +303,14 @@ function SetSceneName() {
 }
 
 function GetSceneSceneTransitionOverride() {
-    obs.call('GetSceneSceneTransitionOverride', {sceneName: 'New Scene'})
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch((err) => {console.log(err)})
+    obs.call('GetSceneSceneTransitionOverride', { sceneName: 'New Scene' })
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        }).catch((err) => { console.log(err) })
 }
 
 function SetSceneSceneTransitionOverride() {
-    obs.call('SetSceneSceneTransitionOverride', {sceneName: 'New Scene'})
+    obs.call('SetSceneSceneTransitionOverride', { sceneName: 'New Scene' })
 }
 
 
@@ -318,23 +318,23 @@ function SetSceneSceneTransitionOverride() {
 
 function GetInputList() {
     obs.call('GetInputList')
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch((err) => {console.log(err)})
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        }).catch((err) => { console.log(err) })
 }
 
 function GetInputKindList() {
     obs.call('GetInputKindList')
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch((err) => {console.log(err)})
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        }).catch((err) => { console.log(err) })
 }
 
 function GetSpecialInputs() {
     obs.call('GetSpecialInputs')
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch((err) => {console.log(err)})
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        }).catch((err) => { console.log(err) })
 }
 
 function CreateInput0() {
@@ -381,18 +381,18 @@ function GetInputDefaultSettings() {
     obs.call('GetInputDefaultSettings', {
         inputKind: 'window_capture'
     })
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch((err) => {console.log(err)})
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        }).catch((err) => { console.log(err) })
 }
 
 function GetInputSettings() {
     obs.call('GetInputSettings', {
         inputName: 'Spotify Music'
     })
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch((err) => {console.log(err)})
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        }).catch((err) => { console.log(err) })
 }
 
 function SetInputSettings() {
@@ -409,9 +409,9 @@ function GetInputMute() {
     obs.call('GetInputMute', {
         inputName: 'Spotify Music'
     })
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch((err) => {console.log(err)})
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        }).catch((err) => { console.log(err) })
 }
 
 function SetInputMute() {
@@ -430,9 +430,9 @@ function GetInputVolume() {
     obs.call('GetInputVolume', {
         inputName: 'Spotify Music'
     })
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch((err) => {console.log(err)})
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        }).catch((err) => { console.log(err) })
 }
 
 function SetInputVolume() {
@@ -446,9 +446,9 @@ function GetInputAudioBalance() {
     obs.call('GetInputAudioBalance', {
         inputName: 'Spotify Music',
     })
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch((err) => {console.log(err)})
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        }).catch((err) => { console.log(err) })
 }
 
 function SetInputAudioBalance() {
@@ -462,9 +462,9 @@ function GetInputAudioSyncOffset() {
     obs.call('GetInputAudioSyncOffset', {
         inputName: 'Spotify Music'
     })
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch((err) => {console.log(err)})
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        }).catch((err) => { console.log(err) })
 }
 
 // function SetInputAudioSyncOffset()
@@ -486,23 +486,23 @@ function GetInputAudioSyncOffset() {
 
 function GetTransitionKindList() {
     obs.call('GetTransitionKindList')
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch((err) => {console.log(err)})
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        }).catch((err) => { console.log(err) })
 }
 
 function GetSceneTransitionList() {
     obs.call('GetSceneTransitionList')
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch((err) => {console.log(err)})
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        }).catch((err) => { console.log(err) })
 }
 
 function GetCurrentSceneTransition() {
     obs.call('GetCurrentSceneTransition')
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch((err) => {console.log(err)})
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        }).catch((err) => { console.log(err) })
 }
 
 // function SetCurrentSceneTransition()
@@ -567,14 +567,13 @@ function DuplicateSceneItem() {
 // function GetVirtualCamStatus()
 
 
-
 // Stream
 
 function GetStreamStatus() {
     obs.call('GetStreamStatus')
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch((err) => {console.log(err)})
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        }).catch((err) => { console.log(err) })
 }
 
 
@@ -582,9 +581,9 @@ function GetStreamStatus() {
 
 function GetRecordStatus() {
     obs.call('GetRecordStatus')
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch((err) => {console.log(err)})
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        }).catch((err) => { console.log(err) })
 }
 
 
@@ -594,9 +593,9 @@ function GetMediaInputStatus() {
     obs.call('GetMediaInputStatus', {
         inputName: ''
     })
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch((err) => {console.log(err)})
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        }).catch((err) => { console.log(err) })
 }
 
 
@@ -607,70 +606,41 @@ function GetStudioModeEnabled() {
 }
 
 
-        // All the functions above are obsolete & for testing purposes only
+
+
+// Custom Functions
 
 
 function AdjustVolume(delta) {
 
     obs.call('GetInputVolume', delta.requestField)
-    
-    .then((data) => {
 
-        obs.call('SetInputVolume', {
-            inputName: data.inputName,
-            inputVolumeDb: data.inputVolumeDb + delta.adjFactor
-        });
+        .then((data) => {
 
-        // db limit -100 to 0
-    })
+            obs.call('SetInputVolume', {
+                inputName: data.inputName,
+                inputVolumeDb: data.inputVolumeDb + delta.adjFactor
+            });
+
+            // db limit -100 to 0
+        })
 };
 
 
-
-function RunObs(delta) {
-    obs.call(delta.functionName, delta.requestField)
-    .then((data) => {
-        console.log(JSON.stringify(data))
-    }).catch((err) => {console.log(err)})
+function RunObs(functionName, requestField) {
+    obs.call(functionName, requestField)
+        .then((data) => {
+            console.log(JSON.stringify(data))
+        }).catch((err) => {
+            console.log(`RunObs Error:${err}`)
+        })
 }
 
-// "Get"
-
-// "Set"
-
-// "Create"
-
-// "Remove"
-
-// "Trigger"
-
-// "Toggle"
-
-// "Open"
-
-// "Start"
-
-// "Stop"
-
-// "Save"
 
 
-// UNIQUE FUNCTIONS
-
-    // CallVendorRequest()
-    // Sleep()
-
-    // DuplicateSceneItem()
-
-    // SendStreamCaption()
-
-    // PauseRecord()
-
-    // ResumeRecord()
-
-    // OffsetMediaInputCursor()
 
 
+// "Reactions"
 
 obs.on('InputCreated', event => {
     console.log(`New input: ${event.inputName}`);
@@ -681,13 +651,12 @@ obs.on('SceneCreated', event => {
 });
 
 obs.on('CurrentProgramSceneChanged', event => {
-        console.log(`Current scene changed to: ${event.sceneName}`);
-    });
+    console.log(`Current scene changed to: ${event.sceneName}`);
+});
 
 obs.on('SceneRemoved', event => {
     console.log(`Removed scene: ${event.sceneName}`);
 });
-
 
 
 
@@ -696,6 +665,9 @@ export {
     // pluginData,
 
     RunObs,
+    // call,
+
+    // AdjustVolume
 
     // GetVersion,
     // GetStats,
@@ -835,29 +807,4 @@ export {
     // OpenInputPropertiesDialog,
     // OpenInputFiltersDialog,
     // OpenInputInteractDialog,
-    
-    // AdjustVolume,
 }
-
-setTimeout(() => {
-
-    // obs.call('GetVersion')
-
-    //     .then((data) => {
-    //         console.log(JSON.stringify(data))
-    //     }).catch ((err) => {
-    //         console.log(err)
-    //     })
-        
-    // obs.call('GetSceneItemList', {
-    //     sceneName: 'visual studio code'
-    // })
-
-    //     .then((data) => {
-    //         console.log(JSON.stringify(data))
-    //     }).catch ((err) => {
-    //         console.log(err)
-    //     });;
-
-
-}, 1000)
