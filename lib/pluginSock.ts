@@ -1,4 +1,4 @@
-import path from 'path';
+import * as path  from 'path';
 import { send } from 'process';
 import { Message, sendMessage } from './messages.js'
 import { Msg, strfy } from './utils.js'

@@ -15,10 +15,11 @@ import { ReadlineParser } from '@serialport/parser-readline'
 import { InputRegistry } from './device.js'
 
 import { Msg, strfy } from './lib/utils.js'
+import { Stream } from 'stream'
 const msg = Msg('MakeShiftSerial');
 
-let inputBuffer:number[] = [];
-let dataTimer:NodeJS.Timer;
+let inputBuffer: number[] = [];
+let dataTimer: NodeJS.Timer;
 const SLIP_OPTIONS = {
     ESC: 219,
     END: 192,
@@ -30,7 +31,7 @@ const slipDecoder = new SlipDecoder(SLIP_OPTIONS);
 
 slipDecoder.on('data', (data: Buffer) => {
     const header = data.slice(0, 1).at(0);
-    const body = data.slice(1,19);
+    const body = data.slice(1, 19);
     msg(`Header: `)
     msg(header)
     switch (header) {
@@ -45,7 +46,9 @@ slipDecoder.on('data', (data: Buffer) => {
             msg(`Got undefined header state: ${header}`);
             break;
     }
-    }); // decoder -> console
+}); // decoder -> console
+
+// slipEncoder.pipe
 
 try {
     let port = await getPort();
@@ -58,7 +61,11 @@ try {
     msg(e);
 }
 
-function handleStateUpdate(data:Buffer) {
+setInterval(() => {
+    slipEncoder.write('echo!\n')
+}, 3000)
+
+function handleStateUpdate(data: Buffer) {
     let states: boolean[] = [];
     const buttonsRaw = data.slice(0, 2).reverse();
     const dialsRaw = data.slice(2, 18);
@@ -88,19 +95,28 @@ async function getPort() {
     try {
         const portList = await SerialPort.list();
 
-        // console.dir(portList);
+        portList.forEach(portInfo => {
+            msg(`port vid: ${typeof portInfo.vendorId} \n port pid: ${portInfo.productId}`);
+        })
 
         let makeShiftPortInfo = portList.filter((portInfo) => {
-            return (portInfo.vendorId === '16c0'
-                && portInfo.productId === '0483');
+            return ((portInfo.vendorId === '16c0'
+                || portInfo.vendorId === '16C0')
+                && (portInfo.productId === '0483'));
         });
 
         msg(`Found ports: ${strfy(makeShiftPortInfo)}`)
+        console.dir(makeShiftPortInfo.length);
 
-        return new SerialPort({
-            path: makeShiftPortInfo[0].path,
-            baudRate: 9600
-        });
+        if (makeShiftPortInfo.length > 0) {
+            return new SerialPort({
+                path: makeShiftPortInfo[0].path,
+                baudRate: 9600
+            }, (e) => { msg(`o no: ${strfy(e)}`) });
+        } else {
+            throw new Error("No device detected");
+        }
+
     } catch (e) {
         msg(e);
     }

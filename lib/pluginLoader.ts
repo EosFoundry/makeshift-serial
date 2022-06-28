@@ -1,8 +1,8 @@
 import { ChildProcess, fork } from 'child_process'
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
-import EventEmitter from 'events';
-import path from 'path'
+import { EventEmitter } from 'events';
+import * as path from 'path'
 
 import { Msg, strfy } from './utils.js'
 const msg = Msg('PluginLoader');
