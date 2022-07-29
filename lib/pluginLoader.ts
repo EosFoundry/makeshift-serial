@@ -13,8 +13,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const __plugin_dir = path.join(__dirname, '../plugins');
 
+// TODO: CALIBER add your plugin to this list
 let pluginList = [
-    // "dummyPlugin",
+    "dummyPlugin",
     "makeshiftctrl-obs",
 ];
 

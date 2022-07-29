@@ -8,6 +8,10 @@ const pluginData = {
     ],
 }
 
+function doSomethingElse() {
+    
+}
+
 function doSomething() {
     // tell photoshop to open something
     // send a link to the browser

@@ -4,6 +4,5 @@
     "functionsAvailable": [
         "log",
         "doSomething"
-    ],
-    "toaster": "asdf"
+    ]
 }

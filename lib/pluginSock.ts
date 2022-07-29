@@ -2,6 +2,7 @@ import * as path  from 'path';
 import { send } from 'process';
 import { Message, sendMessage } from './messages.js'
 import { Msg, strfy } from './utils.js'
+
 let msg: Function;
 let plugin;
 let manifest;
@@ -77,7 +78,6 @@ process.on('message', (m: Message) => {
       break;
   }
 });
-
 
 async function init() {
   try {
