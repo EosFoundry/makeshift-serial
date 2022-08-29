@@ -8,16 +8,21 @@ import * as readline from 'node:readline';
 import { stdin, stdout } from 'node:process';
 
 import { Msg, strfy } from './lib/utils.js'
+import { DiagnosticCategory } from 'typescript';
 
 const msg = Msg("MakeShiftSerial")
-
 const rl = readline.createInterface({ input: stdin, tabSize: 4 });
 
-loadPlugins()
 
-plugins['makeshiftctrl-obs'].on('ready', () => {
+let pluginList = [
+    // "dummyPlugin",
+    // "makeshiftctrl-obs",
+];
+loadPlugins(pluginList)
 
-})
+// plugins['makeshiftctrl-obs'].on('ready', () => {
+
+// })
 
 
 const makeShift = new MakeShiftPort()
@@ -38,13 +43,12 @@ makeShift.on(MKSHFT_EV.DISCONNECTED, () => {
 })
 
 
-makeShift.on(BUTTON_EV.PRESSED[0], () => {
-  plugins['dummyPlugin'].runFunction('doSomething', [])
-  plugins['makeshiftctrl-obs'].callFunction('doThisThing', 
-    { sceneName: 'scene1' }
-  )
-})
 
+DIAL_EV.forEach((ev) => {
+  makeShift.on(ev, (state) => {
+    msg(`${ev} - ${state}`)
+  })
+})
 BUTTON_EV.PRESSED.forEach((ev) => {
   makeShift.on(ev, () => {
     // do stuff you want
@@ -53,7 +57,7 @@ BUTTON_EV.PRESSED.forEach((ev) => {
   })
 })
 
-BUTTON_EV.PRESSED.forEach((ev) => {
+BUTTON_EV.RELEASED.forEach((ev) => {
   makeShift.on(ev, () => {
     msg(ev)
   })

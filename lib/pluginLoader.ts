@@ -14,10 +14,6 @@ const __dirname = path.dirname(__filename);
 const __plugin_dir = path.join(__dirname, '../plugins');
 
 // TODO: CALIBER add your plugin to this list
-let pluginList = [
-    "dummyPlugin",
-    "makeshiftctrl-obs",
-];
 
 let plugins = {};
 
@@ -93,7 +89,7 @@ class Plugin extends EventEmitter {
     }
 }
 
-function loadPlugins() {
+function loadPlugins(pluginList : Array<string>) {
     for (let id of pluginList) {
         msg('reading manifest from - ' + id);
         let data = readFileSync(
