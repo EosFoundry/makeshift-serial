@@ -1,5 +1,4 @@
 import { BUTTON_EV, DIAL_EV, MakeShiftPort, MkshftState, MKSHFT_EV } from './lib/makeShiftPort.js';
-import { ReadlineParser } from '@serialport/parser-readline'
 
 import { loadPlugins, plugins } from "./lib/pluginLoader.js";
 
