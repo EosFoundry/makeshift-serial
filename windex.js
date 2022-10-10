@@ -1,10 +1,11 @@
 import { BUTTON_EV, DIAL_EV, MakeShiftPort, MKSHFT_EV } from './lib/makeShiftPort.js';
 import { loadPlugins } from "./lib/pluginLoader.js";
 import * as readline from 'node:readline';
-import { stdin } from 'node:process';
+import { stdin, stdout } from 'node:process';
 import { Msg } from './lib/utils.js';
 const msg = Msg("MakeShiftSerial");
-const rl = readline.createInterface({ input: stdin, tabSize: 4 });
+const rl = readline.createInterface({ input: stdin, tabSize: 4, output: stdout });
+rl.setPrompt("SEND => ");
 let pluginList = [
 // "dummyPlugin",
 // "makeshiftctrl-obs",
@@ -12,11 +13,11 @@ let pluginList = [
 loadPlugins(pluginList);
 // plugins['makeshiftctrl-obs'].on('ready', () => {
 // })
+stdout.on('end', () => rl.prompt);
 const makeShift = new MakeShiftPort();
 // Initialize readline
 // Initialize connection looper
 makeShift.on(MKSHFT_EV.CONNECTED, () => {
-    rl.setPrompt("SEND => ");
     rl.on('line', (line) => {
         makeShift.write(line);
     });

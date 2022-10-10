@@ -24,7 +24,7 @@ class Plugin extends EventEmitter {
     sock: ChildProcess;
     msg: Function;
 
-    handleMessage (this:Plugin, m: Message) : void {
+    handleMessage(this: Plugin, m: Message): void {
         this.msg(`Message received from sock --> Label: ${m.label} | Data: ${strfy(m.data)}`);
         switch (m.label) {
             case 'status':
@@ -42,7 +42,7 @@ class Plugin extends EventEmitter {
 
     // TODO: get call working
 
-    callFunction (name: string, message?:any): void {
+    callFunction(name: string, message?: any): void {
         this.send('call', {
             name: name,
             args: message ? message : {}
@@ -89,7 +89,7 @@ class Plugin extends EventEmitter {
     }
 }
 
-function loadPlugins(pluginList : Array<string>) {
+function loadPlugins(pluginList: Array<string>) {
     for (let id of pluginList) {
         msg('reading manifest from - ' + id);
         let data = readFileSync(

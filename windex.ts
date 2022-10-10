@@ -1,6 +1,5 @@
 import { BUTTON_EV, DIAL_EV, MakeShiftPort, MkshftState, MKSHFT_EV } from './lib/makeShiftPort.js';
 import { ReadlineParser } from '@serialport/parser-readline'
-import { InputRegistry } from './device.js'
 
 import { loadPlugins, plugins } from "./lib/pluginLoader.js";
 
@@ -11,12 +10,13 @@ import { Msg, strfy } from './lib/utils.js'
 import { DiagnosticCategory } from 'typescript';
 
 const msg = Msg("MakeShiftSerial")
-const rl = readline.createInterface({ input: stdin, tabSize: 4 });
+const rl = readline.createInterface({ input: stdin, tabSize: 4, output: stdout });
+rl.setPrompt("SEND => ");
 
 
 let pluginList = [
-    // "dummyPlugin",
-    // "makeshiftctrl-obs",
+  // "dummyPlugin",
+  // "makeshiftctrl-obs",
 ];
 loadPlugins(pluginList)
 
@@ -24,6 +24,7 @@ loadPlugins(pluginList)
 
 // })
 
+stdout.on('end', () => rl.prompt)
 
 const makeShift = new MakeShiftPort()
 
@@ -31,14 +32,12 @@ const makeShift = new MakeShiftPort()
 
 // Initialize connection looper
 makeShift.on(MKSHFT_EV.CONNECTED, () => {
-  rl.setPrompt("SEND => ");
   rl.on('line', (line) => {
     makeShift.write(line)
   })
 })
 
 makeShift.on(MKSHFT_EV.DISCONNECTED, () => {
-  
   rl.removeAllListeners()
 })
 
