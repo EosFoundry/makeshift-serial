@@ -1,17 +1,16 @@
-import { ChildProcess, fork } from 'child_process'
-import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
-import { EventEmitter } from 'events';
-import * as path from 'path'
+import { ChildProcess, fork } from 'node:child_process'
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { EventEmitter } from 'node:events';
+import { join } from 'node:path'
 
 import { Msg, strfy } from './utils.js'
 const msg = Msg('PluginLoader');
 
 import { Message, sendMessage } from './messages.js'
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const __plugin_dir = path.join(__dirname, '../plugins');
+const workingDir = process.cwd()
+const pluginDir = join(workingDir, '../plugins');
 
 // TODO: CALIBER add your plugin to this list
 
@@ -93,7 +92,7 @@ function loadPlugins(pluginList: Array<string>) {
     for (let id of pluginList) {
         msg('reading manifest from - ' + id);
         let data = readFileSync(
-            path.join(__plugin_dir, id, 'manifest.json'),
+            join(pluginDir, id, 'manifest.json'),
             { encoding: 'UTF8' as BufferEncoding }
         )
         let manifest = JSON.parse(data);

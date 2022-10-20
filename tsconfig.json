@@ -1,11 +1,9 @@
 {
-    "compilerOptions": {
-        "module": "es2022",
-        "target": "es2017",
-        "resolveJsonModule" : true,
-        "moduleResolution": "node",
-    },
-    "ts-node": {
-        "esm": true,
-    },
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "ESNext",
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+  },
 }
