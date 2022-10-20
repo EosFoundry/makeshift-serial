@@ -38,13 +38,13 @@ Events.DIAL.forEach((ev) => {
   })
 })
 Events.BUTTON.PRESSED.forEach((ev) => {
-  makeShift.on(ev, () => {
+  makeShift.on(ev, (state) => {
     msg(`${ev} - ${state}`)
   })
 })
 
 Events.BUTTON.RELEASED.forEach((ev) => {
-  makeShift.on(ev, () => {
+  makeShift.on(ev, (state) => {
     msg(`${ev} - ${state}`)
   })
 })
