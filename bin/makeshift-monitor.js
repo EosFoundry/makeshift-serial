@@ -5,6 +5,7 @@ import {
 
 import * as readline from 'node:readline';
 import { stdin, stdout } from 'node:process';
+import { exec } from 'node:child_process'
 
 import { Msg, strfy } from '../src/utils.js'
 
@@ -37,6 +38,7 @@ Events.DIAL.forEach((ev) => {
     msg(`${ev} - ${state}`)
   })
 })
+
 Events.BUTTON.PRESSED.forEach((ev) => {
   makeShift.on(ev, (state) => {
     msg(`${ev} - ${state}`)
@@ -47,4 +49,9 @@ Events.BUTTON.RELEASED.forEach((ev) => {
   makeShift.on(ev, (state) => {
     msg(`${ev} - ${state}`)
   })
+})
+
+
+makeShift.on(Events.BUTTON.RELEASED[2], (state) => {
+  exec('oascript /location/to/your/script.file')
 })

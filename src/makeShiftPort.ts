@@ -93,7 +93,15 @@ export class MakeShiftPort extends EventEmitter {
   private slipEncoder = new SlipEncoder(SLIP_OPTIONS)
   private slipDecoder = new SlipDecoder(SLIP_OPTIONS)
   private timeSinceAck: number = 0;
-  private prevState: MkshftState = { buttons: [], dials: [] };
+  private prevState: MkshftState = {
+    buttons: [
+      false, false, false, false,
+      false, false, false, false,
+      false, false, false, false,
+      false, false, false, false,
+    ],
+    dials: [0,0,0,0],
+  };
 
   private deviceReady = false;
 
@@ -104,8 +112,6 @@ export class MakeShiftPort extends EventEmitter {
 
   constructor() {
     super()
-    this.prevState.buttons.fill(false);
-    this.prevState.dials.fill(0);
     this.on(MKSHFT_EV.STATE_UPDATE, (currState: MkshftState) => {
       let edge;
       for (let id = 0; id < NumOfButtons; id++) {
@@ -257,7 +263,7 @@ export class MakeShiftPort extends EventEmitter {
   openPort(path: string): void {
     this.serialPort = new SerialPort({
       path: path,
-      baudRate: 115200
+      baudRate: 42069
     }, (e) => {
       if (e != null) {
         msg(`Something happened while opening port: `)
