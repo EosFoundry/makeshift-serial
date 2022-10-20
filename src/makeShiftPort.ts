@@ -65,6 +65,12 @@ export const DIAL_EV = [
 ]
 const NumOfDials = DIAL_EV.length;
 
+export const Events = {
+  DIAL: DIAL_EV,
+  BUTTON: BUTTON_EV,
+  DEVICE: MKSHFT_EV,
+}
+
 enum PacketType {
   PING,
   ACK,

@@ -1,8 +1,0 @@
-{
-    "name": "makeshiftctrl-obs",
-    "entry": "makeshiftctrl-obs.mjs",
-    "functionsAvailable": [
-        "Connect",
-        "RunObs"
-    ]
-}
