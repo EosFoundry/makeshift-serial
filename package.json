@@ -1,6 +1,6 @@
 {
   "name": "@eos-makeshift/serial",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "author": "James Liu",
   "license": "AGPL-3.0-or-later",
   "description": "Serial communication library with commandline tool for the MakeShift",
