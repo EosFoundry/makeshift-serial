@@ -2,7 +2,7 @@
   "name": "@eos-makeshift/serial",
   "version": "0.9.1",
   "author": "James Liu",
-  "license": "ISC",
+  "license": "AGPL-3.0-or-later",
   "description": "Serial communication library with commandline tool for the MakeShift",
   "main": "index.js",
   "bin": {
