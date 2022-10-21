@@ -1,5 +1,5 @@
 {
-  "name": "makeshift-serial",
+  "name": "@eos-makeshift/serial",
   "version": "0.8.3",
   "author": "James Liu",
   "license": "ISC",
