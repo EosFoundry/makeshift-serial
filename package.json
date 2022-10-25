@@ -7,14 +7,14 @@
   },
   "license": "AGPL-3.0-or-later",
   "description": "Serial communication library with commandline tool for the MakeShift",
-  "main": "index.js",
+  "main": "index.ts",
   "bin": {
     "makeshift-monitor": "./bin/makeshift-monitor.js"
   },
-  "exports": "./index.js",
+  "exports": "./lib/makeshift-serial.js",
   "type": "module",
   "scripts": {
-    "build": "rollup -c",
+    "build": "rollup -c && tsc --emitDeclarationOnly",
     "monitor": "node ./bin/makeshift-monitor",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

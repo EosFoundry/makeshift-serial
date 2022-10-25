@@ -2,76 +2,12 @@ import { SerialPort } from 'serialport'
 import { SlipEncoder, SlipDecoder } from '@serialport/parser-slip-encoder'
 import { Msg, strfy } from './utils.js'
 import { EventEmitter } from 'node:events'
+
 const msg = Msg("MakeShiftPort")
 
 let _connectedDevices = 0;
-export interface MkshftState {
-  buttons: boolean[];
-  dials: number[];
-}
 
-export const MKSHFT_EV = {
-  FOUND: 'makeshift-found',
-  DISCONNECTED: 'makeshift-disconnect',
-  CONNECTED: 'makeshift-connect',
-  STATE_UPDATE: 'state-update',
-}
-
-export const BUTTON_EV = {
-  PRESSED: [
-    'button-01-rise',
-    'button-02-rise',
-    'button-03-rise',
-    'button-04-rise',
-    'button-05-rise',
-    'button-06-rise',
-    'button-07-rise',
-    'button-08-rise',
-    'button-09-rise',
-    'button-10-rise',
-    'button-11-rise',
-    'button-12-rise',
-    'button-13-rise',
-    'button-14-rise',
-    'button-15-rise',
-    'button-16-rise',
-  ],
-  RELEASED: [
-    'button-01-fall',
-    'button-02-fall',
-    'button-03-fall',
-    'button-04-fall',
-    'button-05-fall',
-    'button-06-fall',
-    'button-07-fall',
-    'button-08-fall',
-    'button-09-fall',
-    'button-10-fall',
-    'button-11-fall',
-    'button-12-fall',
-    'button-13-fall',
-    'button-14-fall',
-    'button-15-fall',
-    'button-16-fall',
-  ]
-}
-const NumOfButtons = BUTTON_EV.PRESSED.length;
-
-export const DIAL_EV = [
-  'dial-01',
-  'dial-02',
-  'dial-03',
-  'dial-04',
-]
-const NumOfDials = DIAL_EV.length;
-
-export const Events = {
-  DIAL: DIAL_EV,
-  BUTTON: BUTTON_EV,
-  DEVICE: MKSHFT_EV,
-}
-
-enum PacketType {
+export enum PacketType {
   PING,
   ACK,
   READY,
@@ -80,6 +16,112 @@ enum PacketType {
   STRING,
   DISCONNECT,
 }
+/** 
+ * Events are organized so they are accessible as:
+ *     Events.<EventSource>[?pseudo-id].SubType?
+*/
+export const Events = {
+  DIAL: [
+    {
+      INCREMENT: 'dial-01-increment',
+      DECREMENT: 'dial-01-decrement',
+      CHANGE: 'dial-01-change',
+    },
+    {
+      INCREMENT: 'dial-02-increment',
+      DECREMENT: 'dial-02-decrement',
+      CHANGE: 'dial-02-change',
+    },
+    {
+      INCREMENT: 'dial-03-increment',
+      DECREMENT: 'dial-03-decrement',
+      CHANGE: 'dial-03-change',
+    },
+    {
+      INCREMENT: 'dial-04-increment',
+      DECREMENT: 'dial-04-decrement',
+      CHANGE: 'dial-04-change',
+    },
+  ],
+
+  BUTTON: [
+    {
+      PRESSED: 'button-01-rise',
+      RELEASED: 'button-01-fall',
+    },
+    {
+      PRESSED: 'button-02-rise',
+      RELEASED: 'button-02-fall',
+    },
+    {
+      PRESSED: 'button-03-rise',
+      RELEASED: 'button-03-fall',
+    },
+    {
+      PRESSED: 'button-04-rise',
+      RELEASED: 'button-04-fall',
+    },
+    {
+      PRESSED: 'button-05-rise',
+      RELEASED: 'button-05-fall',
+    },
+    {
+      PRESSED: 'button-06-rise',
+      RELEASED: 'button-06-fall',
+    },
+    {
+      PRESSED: 'button-07-rise',
+      RELEASED: 'button-07-fall',
+    },
+    {
+      PRESSED: 'button-08-rise',
+      RELEASED: 'button-08-fall',
+    },
+    {
+      PRESSED: 'button-09-rise',
+      RELEASED: 'button-09-fall',
+    },
+    {
+      PRESSED: 'button-10-rise',
+      RELEASED: 'button-10-fall',
+    },
+    {
+      PRESSED: 'button-11-rise',
+      RELEASED: 'button-11-fall',
+    },
+    {
+      PRESSED: 'button-12-rise',
+      RELEASED: 'button-12-fall',
+    },
+    {
+      PRESSED: 'button-13-rise',
+      RELEASED: 'button-13-fall',
+    },
+    {
+      PRESSED: 'button-14-rise',
+      RELEASED: 'button-14-fall',
+    },
+    {
+      PRESSED: 'button-15-rise',
+      RELEASED: 'button-15-fall',
+    },
+    {
+      PRESSED: 'button-16-rise',
+      RELEASED: 'button-16-fall',
+    },
+  ],
+  DEVICE: {
+    FOUND: 'makeshift-found',
+    DISCONNECTED: 'makeshift-disconnect',
+    CONNECTED: 'makeshift-connect',
+    STATE_UPDATE: 'state-update',
+  },
+}
+
+
+const NumOfButtons = Events.BUTTON.length;
+
+const NumOfDials = Events.DIAL.length;
 
 const SLIP_OPTIONS = {
   ESC: 219,
@@ -88,19 +130,24 @@ const SLIP_OPTIONS = {
   ESC_ESC: 221,
 }
 
+type MakeShiftState = {
+  buttons: boolean[];
+  dials: number[];
+}
+
 export class MakeShiftPort extends EventEmitter {
   private serialPort: SerialPort;
   private slipEncoder = new SlipEncoder(SLIP_OPTIONS)
   private slipDecoder = new SlipDecoder(SLIP_OPTIONS)
   private timeSinceAck: number = 0;
-  private prevState: MkshftState = {
+  private prevState: MakeShiftState = {
     buttons: [
       false, false, false, false,
       false, false, false, false,
       false, false, false, false,
       false, false, false, false,
     ],
-    dials: [0,0,0,0],
+    dials: [0, 0, 0, 0],
   };
 
   private deviceReady = false;
@@ -112,28 +159,33 @@ export class MakeShiftPort extends EventEmitter {
 
   constructor() {
     super()
-    this.on(MKSHFT_EV.STATE_UPDATE, (currState: MkshftState) => {
-      let edge;
+    this.on(Events.DEVICE.STATE_UPDATE, (currState: MakeShiftState) => {
       for (let id = 0; id < NumOfButtons; id++) {
         if (currState.buttons[id] != this.prevState.buttons[id]) {
-          if (currState.buttons[id]) {
-            edge = 'PRESSED'
+          if (currState.buttons[id] === true) {
+            this.emit(Events.BUTTON[id].PRESSED, currState.buttons[id]);
           }
           else {
-            edge = 'RELEASED'
+            this.emit(Events.BUTTON[id].RELEASED, currState.buttons[id]);
           }
-          this.emit(BUTTON_EV[edge][id], currState.buttons[id]);
         }
       }
+      let delta
       for (let id = 0; id < NumOfDials; id++) {
-        if (currState.dials[id] != this.prevState.dials[id]) {
-          this.emit(DIAL_EV[id], currState.dials[id])
+        delta = this.prevState.dials[id] = currState.dials[id]
+        if (delta !== 0) {
+          this.emit(Events.DIAL[id].CHANGE, currState.dials[id])
+          if (delta > 0) {
+            this.emit(Events.DIAL[id].INCREMENT, currState.dials[id])
+          } else {
+            this.emit(Events.DIAL[id].DECREMENT, currState.dials[id])
+          }
         }
       }
       this.prevState = currState
     })
 
-    this.on(MKSHFT_EV.CONNECTED, () => {
+    this.on(Events.DEVICE.CONNECTED, () => {
       msg("Device connect event")
 
       _connectedDevices++
@@ -152,7 +204,7 @@ export class MakeShiftPort extends EventEmitter {
         }
       }, this._keepAliveDelayMs)
     })
-    this.on(MKSHFT_EV.DISCONNECTED, () => {
+    this.on(Events.DEVICE.DISCONNECTED, () => {
       _connectedDevices--
       this.deviceReady = true;
       msg(`Restart device scanning`)
@@ -169,7 +221,7 @@ export class MakeShiftPort extends EventEmitter {
       switch (header) {
         case PacketType.STATE_UPDATE:
           let newState = MakeShiftPort.parseStateFromBuffer(body)
-          this.emit(MKSHFT_EV.STATE_UPDATE, newState)
+          this.emit(Events.DEVICE.STATE_UPDATE, newState)
           break
         case PacketType.ACK:
           // any packet will act as keepalive ACK, and is handled above
@@ -197,7 +249,7 @@ export class MakeShiftPort extends EventEmitter {
         case PacketType.READY:
           msg(`Got READY from MakeShift`)
           msg(body.toString())
-          this.emit(MKSHFT_EV.CONNECTED)
+          this.emit(Events.DEVICE.CONNECTED)
           break
         default:
           msg(header)
@@ -233,8 +285,8 @@ export class MakeShiftPort extends EventEmitter {
 
   static connectedDevices(): number { return _connectedDevices }
 
-  static parseStateFromBuffer(data: Buffer): MkshftState {
-    let state: MkshftState = {
+  static parseStateFromBuffer(data: Buffer): MakeShiftState {
+    let state: MakeShiftState = {
       buttons: [],
       dials: [],
     }
@@ -295,7 +347,7 @@ export class MakeShiftPort extends EventEmitter {
       this.serialPort.close()
     }
     msg(`Port closed, sending disconnect signal`)
-    this.emit(MKSHFT_EV.DISCONNECTED)
+    this.emit(Events.DEVICE.DISCONNECTED)
   }
 
 
@@ -324,7 +376,7 @@ export class MakeShiftPort extends EventEmitter {
       if (makeShiftPortInfo.length > 0) {
         msg(`Found MakeShift devices: ${strfy(makeShiftPortInfo)}`)
         let path = makeShiftPortInfo[0].path
-        this.emit(MKSHFT_EV.FOUND, path)
+        this.emit(Events.DEVICE.FOUND, path)
         msg(`Opening device with path '${path}'`)
         this.openPort(path)
       } else {

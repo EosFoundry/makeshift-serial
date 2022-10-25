@@ -1,9 +1,17 @@
 {
+  "include": [
+    "./src/*"
+  ],
+  "exclude": [
+    "./lib",
+  ],
   "compilerOptions": {
     "module": "ESNext",
     "target": "ESNext",
     "resolveJsonModule": true,
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
+    "declaration": true,
+    "declarationDir": "./types",
   },
 }

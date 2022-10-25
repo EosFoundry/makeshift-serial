@@ -39,10 +39,10 @@ Callback examples for button press events:
 ```js
 // state: boolean
 // Two different events for buttons (what's a half A-press!?)
-device.on(Events.BUTTONS.PRESSED[0], (state) => {
+device.on(Events.BUTTONS[0].PRESSED, (state) => {
   console.log(state)
 })
-device.on(Events.BUTTONS.RELEASED[0], (state) => {
+device.on(Events.BUTTONS[0].RELEASED, (state) => {
   console.log(state)
 })
 ```

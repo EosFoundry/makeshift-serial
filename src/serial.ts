@@ -1,5 +1,5 @@
 import { SerialPort } from 'serialport'
-import { Msg, strfy } from '../utils'
+import { Msg, strfy } from './utils'
 const msg = Msg('Serial');
 
 export async function getPort() {
