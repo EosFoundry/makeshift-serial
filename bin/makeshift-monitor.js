@@ -1,7 +1,7 @@
 import {
   Events,
   MakeShiftPort,
-} from '../lib/makeshift-serial.js';
+} from '../lib/makeshift-serial.mjs';
 
 import * as readline from 'node:readline';
 import { stdin, stdout } from 'node:process';
