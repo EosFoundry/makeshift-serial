@@ -7,7 +7,7 @@
   },
   "license": "AGPL-3.0-or-later",
   "description": "Serial communication library with commandline tool for the MakeShift",
-  "main": "index.ts",
+  "main": "index.js",
   "bin": {
     "makeshift-monitor": "./bin/makeshift-monitor.js"
   },

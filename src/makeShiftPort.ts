@@ -48,66 +48,82 @@ export const Events = {
     {
       PRESSED: 'button-01-rise',
       RELEASED: 'button-01-fall',
+      CHANGE: 'button-01-change',
     },
     {
       PRESSED: 'button-02-rise',
       RELEASED: 'button-02-fall',
+      CHANGE: 'button-02-change',
     },
     {
       PRESSED: 'button-03-rise',
       RELEASED: 'button-03-fall',
+      CHANGE: 'button-03-change',
     },
     {
       PRESSED: 'button-04-rise',
       RELEASED: 'button-04-fall',
+      CHANGE: 'button-04-change',
     },
     {
       PRESSED: 'button-05-rise',
       RELEASED: 'button-05-fall',
+      CHANGE: 'button-05-change',
     },
     {
       PRESSED: 'button-06-rise',
       RELEASED: 'button-06-fall',
+      CHANGE: 'button-06-change',
     },
     {
       PRESSED: 'button-07-rise',
       RELEASED: 'button-07-fall',
+      CHANGE: 'button-07-change',
     },
     {
       PRESSED: 'button-08-rise',
       RELEASED: 'button-08-fall',
+      CHANGE: 'button-08-change',
     },
     {
       PRESSED: 'button-09-rise',
       RELEASED: 'button-09-fall',
+      CHANGE: 'button-09-change',
     },
     {
       PRESSED: 'button-10-rise',
       RELEASED: 'button-10-fall',
+      CHANGE: 'button-10-change',
     },
     {
       PRESSED: 'button-11-rise',
       RELEASED: 'button-11-fall',
+      CHANGE: 'button-11-change',
     },
     {
       PRESSED: 'button-12-rise',
       RELEASED: 'button-12-fall',
+      CHANGE: 'button-12-change',
     },
     {
       PRESSED: 'button-13-rise',
       RELEASED: 'button-13-fall',
+      CHANGE: 'button-13-change',
     },
     {
       PRESSED: 'button-14-rise',
       RELEASED: 'button-14-fall',
+      CHANGE: 'button-14-change',
     },
     {
       PRESSED: 'button-15-rise',
       RELEASED: 'button-15-fall',
+      CHANGE: 'button-15-change',
     },
     {
       PRESSED: 'button-16-rise',
       RELEASED: 'button-16-fall',
+      CHANGE: 'button-16-change',
     },
   ],
   DEVICE: {
@@ -162,6 +178,7 @@ export class MakeShiftPort extends EventEmitter {
     this.on(Events.DEVICE.STATE_UPDATE, (currState: MakeShiftState) => {
       for (let id = 0; id < NumOfButtons; id++) {
         if (currState.buttons[id] != this.prevState.buttons[id]) {
+
           if (currState.buttons[id] === true) {
             this.emit(Events.BUTTON[id].PRESSED, currState.buttons[id]);
           }

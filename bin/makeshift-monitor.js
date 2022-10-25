@@ -18,40 +18,30 @@ stdout.on('end', () => rl.prompt)
 
 const makeShift = new MakeShiftPort()
 
-// Initialize readline
-
-// Initialize connection looper
+// Attach readline to port when connection happens
 makeShift.on(Events.DEVICE.CONNECTED, () => {
   rl.on('line', (line) => {
     makeShift.write(line)
   })
 })
 
+// Detach readline when disconnected
 makeShift.on(Events.DEVICE.DISCONNECTED, () => {
   rl.removeAllListeners()
 })
 
 
-
 Events.DIAL.forEach((ev) => {
-  makeShift.on(ev, (state) => {
+  makeShift.on(ev.CHANGE, (state) => {
     msg(`${ev} - ${state}`)
   })
 })
 
-Events.BUTTON.PRESSED.forEach((ev) => {
-  makeShift.on(ev, (state) => {
+Events.BUTTON.forEach((ev) => {
+  makeShift.on(ev.PRESSED, (state) => {
     msg(`${ev} - ${state}`)
   })
-})
-
-Events.BUTTON.RELEASED.forEach((ev) => {
-  makeShift.on(ev, (state) => {
+  makeShift.on(ev.RELEASED, (state) => {
     msg(`${ev} - ${state}`)
   })
-})
-
-
-makeShift.on(Events.BUTTON.RELEASED[2], (state) => {
-  exec('oascript /location/to/your/script.file')
 })
