@@ -8,7 +8,7 @@ export default {
     'serialport'
   ],
   output: {
-    file: 'lib/makeshift-serial.js',
+    file: 'lib/makeshift-serial.mjs',
     format: 'module',
   },
   plugins: [
