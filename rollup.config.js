@@ -7,10 +7,16 @@ export default {
   external: [
     'serialport'
   ],
-  output: {
-    file: 'lib/makeshift-serial.mjs',
-    format: 'module',
-  },
+  output: [
+    {
+      file: 'lib/makeshift-serial.mjs',
+      format: 'module',
+    },
+    {
+      file: 'lib/makeshift-serial.umd.js',
+      format: 'cjs',
+    },
+  ],
   plugins: [
     typescript({ tsconfig: './tsconfig.json' }),
     nodeResolve(),
