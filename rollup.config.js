@@ -13,7 +13,7 @@ export default {
       format: 'module',
     },
     {
-      file: 'lib/makeshift-serial.umd.js',
+      file: 'lib/makeshift-serial.umd.cjs',
       format: 'cjs',
     },
   ],

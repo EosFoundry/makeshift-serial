@@ -7,7 +7,7 @@
   },
   "license": "AGPL-3.0-or-later",
   "description": "Serial communication library with commandline tool for the MakeShift",
-  "main": "./lib/makeshift-serial.umd.js",
+  "main": "./lib/makeshift-serial.umd.cjs",
   "module": "./lib/makeshift-serial.mjs",
   "bin": {
     "makeshift-monitor": "./bin/makeshift-monitor.js"
@@ -15,7 +15,7 @@
   "exports": {
     ".": {
       "import": "./lib/makeshift-serial.mjs",
-      "require": "./lib/makeshift-serial.umd.js"
+      "require": "./lib/makeshift-serial.umd.cjs"
     }
   },
   "type": "module",
