@@ -1,6 +1,8 @@
 /// <reference types="node" />
 /// <reference types="node" />
+import { Msg } from './utils';
 import { EventEmitter } from 'node:events';
+export { Msg };
 export declare enum PacketType {
     PING = 0,
     ACK = 1,
@@ -43,6 +45,9 @@ export declare class MakeShiftPort extends EventEmitter {
     private timeSinceAck;
     private prevState;
     private deviceReady;
+    private id;
+    prompt(): string;
+    private msg;
     private _pollDelayMs;
     private _keepAliveTimeout;
     private _keepAliveDelayMs;
@@ -59,4 +64,3 @@ export declare class MakeShiftPort extends EventEmitter {
     get pollDelayMs(): number;
     set pollDelayMs(delay: number);
 }
-export {};

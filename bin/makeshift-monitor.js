@@ -1,22 +1,23 @@
 import {
   Events,
   MakeShiftPort,
+  Msg
 } from '../lib/makeshift-serial.mjs';
 
 import * as readline from 'node:readline';
 import { stdin, stdout } from 'node:process';
 import { exec } from 'node:child_process'
 
-import { Msg, strfy } from '../src/utils.js'
 
 
-const msg = Msg("MakeShift")
 const rl = readline.createInterface({ input: stdin, tabSize: 4, output: stdout });
 rl.setPrompt("SEND => ");
 
 stdout.on('end', () => rl.prompt)
 
 const makeShift = new MakeShiftPort()
+
+const msg = Msg('Monitor')
 
 // Attach readline to port when connection happens
 makeShift.on(Events.DEVICE.CONNECTED, () => {

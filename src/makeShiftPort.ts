@@ -1,11 +1,12 @@
 import { SerialPort } from 'serialport'
 import { SlipEncoder, SlipDecoder } from '@serialport/parser-slip-encoder'
-import { Msg, strfy } from './utils.js'
+import { Msg, strfy } from './utils'
 import { EventEmitter } from 'node:events'
-
-const msg = Msg("MakeShiftPort")
+import { nanoid } from 'nanoid'
+export { Msg }
 
 let _connectedDevices = 0;
+
 
 export enum PacketType {
   PING,
@@ -167,6 +168,12 @@ export class MakeShiftPort extends EventEmitter {
   };
 
   private deviceReady = false;
+  private id = ''
+  prompt() {
+    let deviceID = this.deviceReady ? this.serialPort.port.fd : ''
+    return `MSP(${this.id.slice(0, 4)}:${deviceID})`
+  }
+  private msg: (any);
 
   private _pollDelayMs: number = 500;
   private _keepAliveTimeout: number = 5000;
@@ -175,6 +182,8 @@ export class MakeShiftPort extends EventEmitter {
 
   constructor() {
     super()
+    this.id = nanoid(23)
+    this.msg = Msg(this.prompt())
     this.on(Events.DEVICE.STATE_UPDATE, (currState: MakeShiftState) => {
       for (let id = 0; id < NumOfButtons; id++) {
         if (currState.buttons[id] != this.prevState.buttons[id]) {
@@ -203,7 +212,7 @@ export class MakeShiftPort extends EventEmitter {
     })
 
     this.on(Events.DEVICE.CONNECTED, () => {
-      msg("Device connect event")
+      this.msg("Device connect event")
 
       _connectedDevices++
       this.deviceReady = true;
@@ -211,9 +220,9 @@ export class MakeShiftPort extends EventEmitter {
       this.keepAliveTimer = setInterval(() => {
         const elapsedTime = Date.now() - this.timeSinceAck
         if (elapsedTime >= this._keepAliveDelayMs - 40) {
-          // msg(`${this._keepAliveDelayMs}ms keepalive check`)
+          // this.msg(`${this._keepAliveDelayMs}ms keepalive check`)
           if (elapsedTime > this._keepAliveTimeout) {
-            msg(`Device unresponsive for ${this._keepAliveTimeout}ms, disconnecting`)
+            this.msg(`Device unresponsive for ${this._keepAliveTimeout}ms, disconnecting`)
             this.closePort()
           } else {
             this.sendByte(PacketType.PING)
@@ -224,7 +233,7 @@ export class MakeShiftPort extends EventEmitter {
     this.on(Events.DEVICE.DISCONNECTED, () => {
       _connectedDevices--
       this.deviceReady = true;
-      msg(`Restart device scanning`)
+      this.msg(`Restart device scanning`)
       this.scanForDevice()
     })
 
@@ -242,7 +251,7 @@ export class MakeShiftPort extends EventEmitter {
           break
         case PacketType.ACK:
           // any packet will act as keepalive ACK, and is handled above
-          // msg(`Got ACK from MakeShift`)
+          // this.msg(`Got ACK from MakeShift`)
           break
         case PacketType.STRING:
           let d = new Date()
@@ -257,20 +266,20 @@ export class MakeShiftPort extends EventEmitter {
           console.log(s + ": " + body.toString())
           break
         case PacketType.PING:
-          msg(`Got PING from MakeShift, responding with ACK`)
+          this.msg(`Got PING from MakeShift, responding with ACK`)
           this.sendByte(PacketType.ACK);
           break
         case PacketType.ERROR:
-          msg(`Got ERROR from MakeShift`)
+          this.msg(`Got ERROR from MakeShift`)
           break
         case PacketType.READY:
-          msg(`Got READY from MakeShift`)
-          msg(body.toString())
+          this.msg(`Got READY from MakeShift`)
+          this.msg(body.toString())
           this.emit(Events.DEVICE.CONNECTED)
           break
         default:
-          msg(header)
-          msg(data.toString())
+          this.msg(header)
+          this.msg(data.toString())
           break
       }
     }); // decoder -> console
@@ -282,7 +291,7 @@ export class MakeShiftPort extends EventEmitter {
     if (this.serialPort.isOpen) {
       this.serialPort.flush()
       let buf = Buffer.from([t])
-      // msg(`Sending ping:`)
+      // this.msg(`Sending ping:`)
       // console.dir(buf)
       this.slipEncoder.write(buf)
     }
@@ -294,7 +303,7 @@ export class MakeShiftPort extends EventEmitter {
       let h = Buffer.from([t])
       let b = Buffer.from(body)
       const buf = Buffer.concat([h, b]);
-      // msg(`Sending buffer:`)
+      // this.msg(`Sending buffer:`)
       // console.dir(buf)
       this.slipEncoder.write(buf)
     }
@@ -335,13 +344,13 @@ export class MakeShiftPort extends EventEmitter {
       baudRate: 42069
     }, (e) => {
       if (e != null) {
-        msg(`Something happened while opening port: `)
+        this.msg(`Something happened while opening port: `)
         console.dir(e);
 
-        msg('Restarting scan for open ports...')
+        this.msg('Restarting scan for open ports...')
         setTimeout(() => { this.scanForDevice() }, this.pollDelayMs);
       } else {
-        msg('SerialPort opened, attaching SLIP translators')
+        this.msg('SerialPort opened, attaching SLIP translators')
         this.slipEncoder.pipe(this.serialPort) // node -> teensy
         this.serialPort.pipe(this.slipDecoder) // teensy -> decoder
         this.sendByte(PacketType.READY)
@@ -350,36 +359,35 @@ export class MakeShiftPort extends EventEmitter {
   }
 
   closePort() {
-    msg(`Closing MakeShift port...`)
-    msg(`Clearing keepalive timer`)
+    this.msg(`Closing MakeShift port...`)
+    this.msg(`Clearing keepalive timer`)
     clearInterval(this.keepAliveTimer)
-    msg(`Unpiping encoders`)
+    this.msg(`Unpiping encoders`)
     this.slipEncoder.unpipe()
     this.serialPort.unpipe()
     if (this.serialPort.isOpen) {
-      msg(`Port object found open`)
-      msg(`Sending disconnect packet`)
+      this.msg(`Port object found open`)
+      this.msg(`Sending disconnect packet`)
       this.sendByte(PacketType.DISCONNECT)
-      msg(`Closing port`)
+      this.msg(`Closing port`)
       this.serialPort.close()
     }
-    msg(`Port closed, sending disconnect signal`)
+    this.msg(`Port closed, sending disconnect signal`)
     this.emit(Events.DEVICE.DISCONNECTED)
   }
-
 
   write(line: string): void {
     if (this.deviceReady) {
       this.send(PacketType.STRING, line)
     } else {
-      msg("MakeShift disconnected, line not sent")
+      this.msg("MakeShift not ready, line not sent")
     }
   }
 
   scanForDevice() {
     SerialPort.list().then((portList) => {
       // portList.forEach(portInfo => {
-      //   msg(`port vid: ${typeof portInfo.vendorId} \n port pid: ${portInfo.productId}`)
+      //   this.msg(`port vid: ${typeof portInfo.vendorId} \n port pid: ${portInfo.productId}`)
       // })
 
       let makeShiftPortInfo = portList.filter((portInfo) => {
@@ -391,17 +399,17 @@ export class MakeShiftPort extends EventEmitter {
       // console.dir(makeShiftPortInfo.length)
 
       if (makeShiftPortInfo.length > 0) {
-        msg(`Found MakeShift devices: ${strfy(makeShiftPortInfo)}`)
+        this.msg(`Found MakeShift devices: ${strfy(makeShiftPortInfo)}`)
         let path = makeShiftPortInfo[0].path
         this.emit(Events.DEVICE.FOUND, path)
-        msg(`Opening device with path '${path}'`)
+        this.msg(`Opening device with path '${path}'`)
         this.openPort(path)
       } else {
-        msg(`No MakeShift devices found, continuing scan...`)
+        this.msg(`No MakeShift devices found, continuing scan...`)
         setTimeout(() => { this.scanForDevice() }, this.pollDelayMs);
       }
     }).catch((e) => {
-      msg(e)
+      this.msg(e)
     })
   }
 
