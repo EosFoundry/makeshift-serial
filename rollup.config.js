@@ -3,7 +3,7 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 
 export default {
-  input: './src/makeShiftPort.ts',
+  input: './src/index.ts',
   external: [
     'serialport'
   ],
@@ -19,7 +19,9 @@ export default {
   ],
   plugins: [
     typescript({ tsconfig: './tsconfig.json' }),
-    nodeResolve(),
+    nodeResolve({
+      exportConditions: ['node'],
+    }),
     commonjs(),
   ]
 };

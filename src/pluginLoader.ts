@@ -1,36 +1,50 @@
 import { ChildProcess, fork } from 'node:child_process'
+import { join } from 'pathe'
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { EventEmitter } from 'node:events';
-import { join } from 'node:path'
 
-import { Msg, strfy } from './utils.js'
-const msg = Msg('PluginLoader');
+import { filterName, LogLevel, Msg, Msger, MsgLvFunctorMap, strfy } from './msg'
+const msgen = new Msg({ host: 'PluginLoader' });
+const log = msgen.getLevelLoggers()
+const msg = log.info
 
 import { Message, sendMessage } from './messages.js'
 
-const workingDir = process.cwd()
-const pluginDir = join(workingDir, '../plugins');
 
-// TODO: CALIBER add your plugin to this list
 
-let plugins = {};
+export class Plugin extends EventEmitter implements Msger {
+    private _id: string
+    get id(): string { return this._id }
 
-class Plugin extends EventEmitter {
-    manifest: any;
-    id: string;
-    functionsAvailable: string[];
-    sock: ChildProcess;
-    msg: Function;
+    private _name: string
+    get name(): string { return this._name }
+
+    private _manifest: any
+    get manifest() { return this._manifest }
+    private _functions: string[]
+    get functions() { return this._functions }
+
+    private sock: ChildProcess
+
+    // logging setup
+    private _logLevel: LogLevel
+    public get logLevel(): LogLevel { return this._logLevel }
+    public set logLevel(l: LogLevel) {
+        this._logLevel = l
+        this._msgenerator.level = l
+    }
+    private _msgenerator: Msg
+    private log: MsgLvFunctorMap
 
     handleMessage(this: Plugin, m: Message): void {
-        this.msg(`Message received from sock --> Label: ${m.label} | Data: ${strfy(m.data)}`);
+        this.log.info(`Message received from sock --> Label: ${m.label} | Data: ${strfy(m.data)}`);
         switch (m.label) {
             case 'status':
                 if (m.data === 'ready') {
                     super.emit('ready');
                 } else if (m.data === 'error loading') {
-                    this.msg(m.data)
+                    this.log.info(m.data)
                 }
                 break;
             case 'data':
@@ -62,20 +76,24 @@ class Plugin extends EventEmitter {
         })
     }
 
-    constructor(manifest: any) {
+    constructor(path: string, manifest: any) {
         super();
-        this.id = manifest.name;
-        this.manifest = manifest;
-        this.functionsAvailable = manifest.functionsAvailable;
-        this.msg = Msg(`Plugin object for ${this.id}`);
+        this._id = manifest.name;
+        this._name = filterName(this._id)
+        this._manifest = manifest;
+        this._functions = manifest.functions;
+        this._msgenerator = new Msg({
+            host: this.name,
+            level: 'none',
+        })
+        this.log = this._msgenerator.getLevelLoggers()
+        this.log.info('Creating new event emitter');
 
-        this.msg('Creating new event emitter');
-
-        this.msg('Sporking new pluginSock');
+        this.log.info('Sporking new pluginSock');
         this.sock = fork('./lib/pluginSock.js');
         this.sock.on('message', this.handleMessage.bind(this))
 
-        this.msg('Initializing pluginSock');
+        this.log.info('Initializing pluginSock');
         sendMessage(this.sock, 'init')
         this.sock.send({
             label: 'init',
@@ -88,23 +106,19 @@ class Plugin extends EventEmitter {
     }
 }
 
-function loadPlugins(pluginList: Array<string>) {
-    for (let id of pluginList) {
-        msg('reading manifest from - ' + id);
-        let data = readFileSync(
-            join(pluginDir, id, 'manifest.json'),
-            { encoding: 'UTF8' as BufferEncoding }
-        )
-        let manifest = JSON.parse(data);
-        msg('Manifest loaded.')
-        msg(manifest);
-        msg('Forking plugin sock...');
-        plugins[id] = new Plugin(manifest);
-    }
-}
+// function loadPlugins(pluginList: Array<string>) {
+//     for (let id of pluginList) {
+//         msg('reading manifest from - ' + id);
+//         let data = readFileSync(
+//             join(pluginDir, id, 'manifest.json'),
+//             { encoding: 'UTF8' as BufferEncoding }
+//         )
+//         let manifest = JSON.parse(data);
+//         msg('Manifest loaded.')
+//         msg(manifest);
+//         msg('Forking plugin sock...');
+//         plugins[id] = new Plugin(manifest);
+//     }
+// }
 
 
-export {
-    loadPlugins,
-    plugins
-}

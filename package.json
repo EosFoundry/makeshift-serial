@@ -20,18 +20,23 @@
   },
   "type": "module",
   "scripts": {
+    "dev": "tsc --emitDeclarationOnly && rollup -c -w",
     "build": "rollup -c && tsc --emitDeclarationOnly",
     "monitor": "node ./bin/makeshift-monitor",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "chalk": "^5.1.2",
     "nanoid": "^4.0.0",
-    "serialport": "^10.4.0"
+    "pathe": "^0.3.9",
+    "serialport": "^10.4.0",
+    "yargs": "^17.6.0"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^23.0.0",
     "@rollup/plugin-node-resolve": "^15.0.0",
     "@types/node": "^17.0.45",
+    "@types/serialport": "^8.0.2",
     "rollup": "^2.79.1",
     "rollup-plugin-typescript": "^1.0.1",
     "terser": "^5.15.1",

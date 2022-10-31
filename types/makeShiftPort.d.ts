@@ -1,8 +1,8 @@
 /// <reference types="node" />
 /// <reference types="node" />
-import { Msg } from './utils';
+import { PortInfo } from '@serialport/bindings-interface';
+import { LogLevel, MsgOptions, Msger } from './msg';
 import { EventEmitter } from 'node:events';
-export { Msg };
 export declare enum PacketType {
     PING = 0,
     ACK = 1,
@@ -11,6 +11,65 @@ export declare enum PacketType {
     ERROR = 4,
     STRING = 5,
     DISCONNECT = 6
+}
+export declare type MakeShiftPortOptions = {
+    logOptions: MsgOptions;
+};
+export declare const makeShiftPortOptionsDefault: MakeShiftPortOptions;
+declare type MakeShiftState = {
+    buttons: boolean[];
+    dials: number[];
+};
+export declare class MakeShiftPort extends EventEmitter implements Msger {
+    private serialPort;
+    private slipEncoder;
+    private slipDecoder;
+    private timeSinceAck;
+    private prevState;
+    private _deviceReady;
+    private _id;
+    private _deviceInfo;
+    private _devicePath;
+    private _msger;
+    private log;
+    private debug;
+    private info;
+    private error;
+    private warn;
+    private fatal;
+    pollDelayMs: number;
+    private _keepAliveTimeout;
+    private _keepAliveDelayMs;
+    private keepAliveTimer;
+    private _logLevel;
+    get logLevel(): LogLevel;
+    set logLevel(l: LogLevel);
+    get logTermFormat(): boolean;
+    set logTermFormat(tf: boolean);
+    /**
+     * This technically is a library global, it keeps track of the number of open ports
+     */
+    static get connectedDevices(): number;
+    /**
+     * If device connected, returns the path as a string, else returns 'D/C'
+     */
+    get devicePath(): string;
+    /**
+     * 23 character id assigned to port on instantiation
+     */
+    get portId(): string;
+    private emitLog;
+    setLogToEmit(): void;
+    setLogToConsole(): void;
+    constructor(options?: MakeShiftPortOptions);
+    private sendByte;
+    private send;
+    static parseStateFromBuffer(data: Buffer): MakeShiftState;
+    openPort(path: string, info: PortInfo): void;
+    closePort(): void;
+    write(line: string): void;
+    scanForDevice(): void;
+    host(): string;
 }
 /**
  * Events are organized so they are accessible as:
@@ -34,33 +93,4 @@ export declare const Events: {
         STATE_UPDATE: string;
     };
 };
-declare type MakeShiftState = {
-    buttons: boolean[];
-    dials: number[];
-};
-export declare class MakeShiftPort extends EventEmitter {
-    private serialPort;
-    private slipEncoder;
-    private slipDecoder;
-    private timeSinceAck;
-    private prevState;
-    private deviceReady;
-    private id;
-    prompt(): string;
-    private msg;
-    private _pollDelayMs;
-    private _keepAliveTimeout;
-    private _keepAliveDelayMs;
-    private keepAliveTimer;
-    constructor();
-    private sendByte;
-    private send;
-    static connectedDevices(): number;
-    static parseStateFromBuffer(data: Buffer): MakeShiftState;
-    openPort(path: string): void;
-    closePort(): void;
-    write(line: string): void;
-    scanForDevice(): void;
-    get pollDelayMs(): number;
-    set pollDelayMs(delay: number);
-}
+export {};

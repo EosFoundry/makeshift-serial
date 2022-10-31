@@ -1,8 +1,9 @@
 import * as path  from 'path';
 import { send } from 'process';
-import { Message, sendMessage } from './messages.js'
-import { Msg, strfy } from './utils.js'
+import { Message, sendMessage } from './messages'
+import { Msg, strfy } from './msg'
 
+let msgHost:Msg;
 let msg: Function;
 let plugin;
 let manifest;
@@ -81,7 +82,8 @@ process.on('message', (m: Message) => {
 
 async function init() {
   try {
-    msg = Msg(`PluginSock for ${config.name}`)
+    msgHost = new Msg({host:`${config.name}`})
+    msg = msgHost.getLevelLoggers().info
     msg('initializing pluginSock with config:')
     console.dir(config);
 
