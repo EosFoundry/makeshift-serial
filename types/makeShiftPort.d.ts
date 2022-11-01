@@ -92,5 +92,8 @@ export declare const Events: {
         CONNECTED: string;
         STATE_UPDATE: string;
     };
+    TERMINAL: {
+        DATA: string;
+    };
 };
 export {};

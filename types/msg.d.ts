@@ -51,13 +51,7 @@ export declare class Msg {
     ps(calledLevel: any): string;
     symbol: MsgLvStringMap;
     private assignOptions;
-    getLevelLoggers(): {
-        debug: () => void;
-        info: () => void;
-        warn: () => void;
-        error: () => void;
-        fatal: () => void;
-    };
+    getLevelLoggers(): MsgLvFunctorMap;
     logger: LoggerFn;
     resetLogger(): void;
     constructor(options: MsgOptions);
