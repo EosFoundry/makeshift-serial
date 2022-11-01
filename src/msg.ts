@@ -41,7 +41,7 @@ export type MsgLvStringMap = {
 }
 
 export type MsgOptions = {
-  host: string,
+  host?: string,
   level?: LogLevel,
   logger?: Function,
   prompt?: string,
