@@ -10,7 +10,7 @@
   "main": "./lib/makeshift-serial.umd.cjs",
   "module": "./lib/makeshift-serial.mjs",
   "bin": {
-    "makeshift-monitor": "./bin/makeshift-monitor.js"
+    "makeshift-monitor": "./bin/makeshift-monitor.mjs"
   },
   "exports": {
     ".": {

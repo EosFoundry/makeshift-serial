@@ -138,7 +138,7 @@ export class MakeShiftPort extends EventEmitter implements Msger {
       }
       let delta
       for (let id = 0; id < NumOfDials; id++) {
-        delta = this.prevState.dials[id] = currState.dials[id]
+        delta = this.prevState.dials[id] - currState.dials[id]
         if (delta !== 0) {
           let ev;
           this.emit(Events.DIAL[id].CHANGE, currState.dials[id])
@@ -148,7 +148,7 @@ export class MakeShiftPort extends EventEmitter implements Msger {
             ev = Events.DIAL[id].DECREMENT
           }
           this.emit(ev, currState.dials[id])
-          this.info(`${ev} with state ${currState.buttons[id]}`)
+          this.info(`${ev} ${delta} with state ${currState.dials[id]}`)
         }
       }
       this.prevState = currState
