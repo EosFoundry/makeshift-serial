@@ -19,11 +19,10 @@
     }
   },
   "types": "./lib/types/index.d.ts",
-  "type": "module",
   "scripts": {
     "dev": "tsc --emitDeclarationOnly && rollup -c -w",
     "build": "rollup -c && tsc --emitDeclarationOnly",
-    "monitor": "node ./bin/makeshift-monitor",
+    "monitor": "node ./bin/makeshift-monitor.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
