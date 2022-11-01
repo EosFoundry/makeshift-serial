@@ -481,7 +481,7 @@ export const Events = {
     STATE_UPDATE: 'state-update',
   },
   TERMINAL: {
-    DATA: 'makeshift-serial-line'
+    DATA: 'makeshift-serial-data'
   }
 }
 
