@@ -42,7 +42,6 @@ const makeShift = new MakeShiftPort({
   logOptions: { level: lglv }
 })
 
-
 // Attach readline to port when connection happens
 makeShift.on(Events.DEVICE.CONNECTED, () => {
   msgen.host = 'Monitor::' + chalk.green(makeShift.devicePath)

@@ -105,21 +105,17 @@ export class MakeShiftPort extends EventEmitter implements Msger {
     })
   }
 
-  setLogToEmit() {
-    this._msger.logger = this.emitLog.bind(this)
-  }
-  setLogToConsole() {
-    this._msger.resetLogger()
-  }
-
   constructor(options = makeShiftPortOptionsDefault) {
     super()
     this._id = nanoid(23)
     this._msger = new Msg(options.logOptions)
     this._msger.host = this.host()
     this.log = this._msger.getLevelLoggers()
-    for (const ltype in this.log) {
-      this[ltype] = this.log[ltype]
+    for (const lv in this.log) {
+      this[lv] = (m: string) => {
+        const logString = this.log[lv](m)
+        this.emitLog(logString, lv as LogLevel)
+      }
     }
 
     this.on(Events.DEVICE.STATE_UPDATE, (currState: MakeShiftState) => {
@@ -148,7 +144,7 @@ export class MakeShiftPort extends EventEmitter implements Msger {
             ev = Events.DIAL[id].DECREMENT
           }
           this.emit(ev, currState.dials[id])
-          this.info(`${ev} ${delta} with state ${currState.dials[id]}`)
+          this.info(`${ev} with state ${currState.dials[id]}`)
         }
       }
       this.prevState = currState

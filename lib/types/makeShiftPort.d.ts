@@ -59,8 +59,6 @@ export declare class MakeShiftPort extends EventEmitter implements Msger {
      */
     get portId(): string;
     private emitLog;
-    setLogToEmit(): void;
-    setLogToConsole(): void;
     constructor(options?: MakeShiftPortOptions);
     private sendByte;
     private send;
