@@ -121,6 +121,7 @@ export class MakeShiftPort extends EventEmitter implements Msger {
     for (const ltype in this.log) {
       this[ltype] = this.log[ltype]
     }
+
     this.on(Events.DEVICE.STATE_UPDATE, (currState: MakeShiftState) => {
       for (let id = 0; id < NumOfButtons; id++) {
         if (currState.buttons[id] != this.prevState.buttons[id]) {
@@ -484,6 +485,12 @@ export const Events = {
     FOUND: 'makeshift-found',
     DISCONNECTED: 'makeshift-disconnect',
     CONNECTED: 'makeshift-connect',
+    /**
+     * This event is emitted from a raw device signal, and contains *all* the
+     * data from a state update. Unless you are doing a spot of hacking on this
+     * library, It's likely more useful to listen to specific input events:
+     * - @see Events.BUTTON or @see Events.DIAL 
+     */
     STATE_UPDATE: 'state-update',
   },
   TERMINAL: {
