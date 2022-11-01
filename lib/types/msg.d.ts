@@ -22,7 +22,7 @@ export declare type MsgLvStringMap = {
     [Property in MsgLevel]: string;
 };
 export declare type MsgOptions = {
-    host: string;
+    host?: string;
     level?: LogLevel;
     logger?: Function;
     prompt?: string;
