@@ -15,7 +15,7 @@
   "exports": {
     ".": {
       "import": "./lib/makeshift-serial.mjs",
-      "require": "./lib/makeshift-serial.umd.cjs"
+      "require": "./lib/makeshift-serial.umd.js"
     }
   },
   "types": "./lib/types/index.d.ts",

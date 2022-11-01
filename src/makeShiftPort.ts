@@ -104,7 +104,7 @@ export class MakeShiftPort extends EventEmitter implements Msger {
       message: msg,
     })
   }
-  
+
   setLogToEmit() {
     this._msger.logger = this.emitLog.bind(this)
   }
@@ -124,24 +124,30 @@ export class MakeShiftPort extends EventEmitter implements Msger {
     this.on(Events.DEVICE.STATE_UPDATE, (currState: MakeShiftState) => {
       for (let id = 0; id < NumOfButtons; id++) {
         if (currState.buttons[id] != this.prevState.buttons[id]) {
+          let ev;
           if (currState.buttons[id] === true) {
-            this.emit(Events.BUTTON[id].PRESSED, currState.buttons[id]);
+            ev = Events.BUTTON[id].PRESSED
           }
           else {
-            this.emit(Events.BUTTON[id].RELEASED, currState.buttons[id]);
+            ev = Events.BUTTON[id].RELEASED
           }
+          this.emit(ev, currState.buttons[id]);
+          this.info(`${ev} with state ${currState.buttons[id]}`)
         }
       }
       let delta
       for (let id = 0; id < NumOfDials; id++) {
         delta = this.prevState.dials[id] = currState.dials[id]
         if (delta !== 0) {
+          let ev;
           this.emit(Events.DIAL[id].CHANGE, currState.dials[id])
           if (delta > 0) {
-            this.emit(Events.DIAL[id].INCREMENT, currState.dials[id])
+            ev = Events.DIAL[id].INCREMENT
           } else {
-            this.emit(Events.DIAL[id].DECREMENT, currState.dials[id])
+            ev = Events.DIAL[id].DECREMENT
           }
+          this.emit(ev, currState.dials[id])
+          this.info(`${ev} with state ${currState.buttons[id]}`)
         }
       }
       this.prevState = currState
