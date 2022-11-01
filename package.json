@@ -18,6 +18,7 @@
       "require": "./lib/makeshift-serial.umd.cjs"
     }
   },
+  "types": "./lib/types/index.d.ts",
   "type": "module",
   "scripts": {
     "dev": "tsc --emitDeclarationOnly && rollup -c -w",
