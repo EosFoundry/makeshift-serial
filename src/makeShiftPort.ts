@@ -98,7 +98,7 @@ export class MakeShiftPort extends EventEmitter implements Msger {
   public get portId(): string { return this._id }
 
   private emitLog: LoggerFn = (msg: string, lv: LogLevel) => {
-    this.emit('log', {
+    this.emit(Events.TERMINAL.DATA, {
       level: lv,
       terminal: this._msger.terminal,
       message: msg,
@@ -480,6 +480,9 @@ export const Events = {
     CONNECTED: 'makeshift-connect',
     STATE_UPDATE: 'state-update',
   },
+  TERMINAL: {
+    DATA: 'makeshift-serial-line'
+  }
 }
 
 
