@@ -1,7 +1,7 @@
 /// <reference types="node" />
 /// <reference types="node" />
 import { PortInfo } from '@serialport/bindings-interface';
-import { LogLevel, MsgOptions, Msger } from './msg';
+import { LogLevel, MsgOptions, Msger, MsgLvStringMap } from './msg';
 import { EventEmitter } from 'node:events';
 export declare enum PacketType {
     PING = 0,
@@ -12,6 +12,10 @@ export declare enum PacketType {
     STRING = 5,
     DISCONNECT = 6
 }
+export declare type LogMessage = {
+    level: LogLevel;
+    message: string;
+};
 export declare type MakeShiftPortOptions = {
     logOptions: MsgOptions;
 };
@@ -97,7 +101,7 @@ export declare const Events: {
         STATE_UPDATE: string;
     };
     TERMINAL: {
-        DATA: string;
+        LOG: MsgLvStringMap;
     };
 };
 export {};

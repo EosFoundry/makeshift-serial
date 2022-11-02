@@ -2,7 +2,7 @@ import { SerialPort } from 'serialport'
 import { PortInfo } from '@serialport/bindings-interface'
 import { SlipEncoder, SlipDecoder } from '@serialport/parser-slip-encoder'
 import {
-  Msg, strfy, oStr, LogLevel, MsgLvFunctorMap, MsgOptions, Msger, LoggerFn
+  Msg, strfy, oStr, LogLevel, MsgLvFunctorMap, MsgOptions, Msger, LoggerFn, MsgLvStringMap
 } from './msg'
 import { EventEmitter } from 'node:events'
 import { basename } from 'pathe'
@@ -19,6 +19,11 @@ export enum PacketType {
   ERROR,
   STRING,
   DISCONNECT,
+}
+
+export type LogMessage = {
+  level: LogLevel,
+  message: string,
 }
 
 export type MakeShiftPortOptions = {
@@ -98,11 +103,11 @@ export class MakeShiftPort extends EventEmitter implements Msger {
   public get portId(): string { return this._id }
 
   private emitLog: LoggerFn = (msg: string, lv: LogLevel) => {
-    this.emit(Events.TERMINAL.DATA, {
+    this.emit(Events.TERMINAL.LOG[lv], {
+      // terminal: this._msger.terminal,
       level: lv,
-      terminal: this._msger.terminal,
       message: msg,
-    })
+    } as LogMessage)
   }
 
   constructor(options = makeShiftPortOptionsDefault) {
@@ -490,7 +495,14 @@ export const Events = {
     STATE_UPDATE: 'state-update',
   },
   TERMINAL: {
-    DATA: 'makeshift-serial-data'
+    LOG: {
+      fatal: 'makeshift-serial-log-fatal',
+      error: 'makeshift-serial-data-error',
+      warn: 'makeshift-serial-data-warn',
+      info: 'makeshift-serial-data-info',
+      debug: 'makeshift-serial-data-debug',
+      all: 'makeshift-serial-log-any',
+    } as MsgLvStringMap
   }
 }
 

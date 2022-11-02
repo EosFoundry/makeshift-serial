@@ -16,17 +16,22 @@ import chalk from 'chalk'
 
 const lstring = JSON.stringify(Object.keys(logRank), null, " ").slice(1, -1).replace(/\n/g, "").replace(/\"/g, '')
 const argv = yargs(hideBin(process.argv))
-  .usage('Usage: $0 -l [string]')
+  .usage('Usage: $0 -l [string] -i')
+  .boolean('i')
+  .string('l')
+  .default('l', 'info')
+  .alias('i', 'inspect')
   .alias('l', 'log-level')
   .alias('h', 'help')
-  .nargs('l', 1)
-  .default('l', 'info')
   .describe('l', `Sets the log level. Accepted: ${lstring}`)
+  .describe('i', 'Logs the event objects recieved.')
   .describe('h', 'Show this message')
   .help('h')
   .argv
 
 let lglv = argv.l
+
+console.log(argv)
 
 const msgen = new Msg({ host: 'Monitor', level: lglv })
 const msg = msgen.getLevelLoggers().info
@@ -41,6 +46,22 @@ stdout.on('end', () => rl.prompt)
 const makeShift = new MakeShiftPort({
   logOptions: { level: lglv }
 })
+
+if (argv.i === true) {
+  function trawl(node) {
+    if (typeof node === 'string') {
+      msg(`trawled ${node}`)
+      makeShift.on(node, (data) => {
+        msg(`${node} :: ${oStr(data)}`)
+      })
+    } else {
+      for (const prop in node) {
+        trawl(node[prop])
+      }
+    }
+  }
+  trawl(Events)
+}
 
 // Attach readline to port when connection happens
 makeShift.on(Events.DEVICE.CONNECTED, () => {

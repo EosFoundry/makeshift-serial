@@ -182,9 +182,8 @@ export class Msg {
       let calledLevel = prop as MsgLevel
 
       this['_' + prop] = (l) => {
-        let logString = ''
+        const logString = `${this.ps(calledLevel)}${l}`
         if (logRank[this.level] <= logRank[calledLevel]) {
-          logString = `${this.ps(calledLevel)}${l}`
           this.logger(logString, calledLevel)
         }
         return logString
