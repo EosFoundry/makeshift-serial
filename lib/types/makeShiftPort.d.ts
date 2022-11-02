@@ -106,4 +106,5 @@ export declare const Events: {
         LOG: MsgLvStringMap;
     };
 };
+export declare type MakeShiftEvents = typeof Events;
 export {};

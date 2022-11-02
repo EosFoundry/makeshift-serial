@@ -508,6 +508,7 @@ export const Events = {
     } as MsgLvStringMap
   }
 }
+export type MakeShiftEvents = typeof Events
 
 
 const NumOfButtons = Events.BUTTON.length;
