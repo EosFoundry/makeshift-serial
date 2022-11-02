@@ -5,6 +5,7 @@ import {
   Msg, strfy, oStr, LogLevel, MsgLvFunctorMap, MsgOptions, Msger, LoggerFn, MsgLvStringMap
 } from './msg'
 import { EventEmitter } from 'node:events'
+import { Buffer } from 'node:buffer'
 import { basename } from 'pathe'
 import { nanoid } from 'nanoid'
 import chalk from 'chalk'
@@ -24,6 +25,7 @@ export enum PacketType {
 export type LogMessage = {
   level: LogLevel,
   message: string,
+  buffer: Buffer,
 }
 
 export type MakeShiftPortOptions = {
@@ -107,6 +109,7 @@ export class MakeShiftPort extends EventEmitter implements Msger {
       // terminal: this._msger.terminal,
       level: lv,
       message: msg,
+      buffer: Buffer.from(msg),
     } as LogMessage)
   }
 

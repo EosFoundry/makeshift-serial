@@ -3,6 +3,7 @@
 import { PortInfo } from '@serialport/bindings-interface';
 import { LogLevel, MsgOptions, Msger, MsgLvStringMap } from './msg';
 import { EventEmitter } from 'node:events';
+import { Buffer } from 'node:buffer';
 export declare enum PacketType {
     PING = 0,
     ACK = 1,
@@ -15,6 +16,7 @@ export declare enum PacketType {
 export declare type LogMessage = {
     level: LogLevel;
     message: string;
+    buffer: Buffer;
 };
 export declare type MakeShiftPortOptions = {
     logOptions: MsgOptions;
