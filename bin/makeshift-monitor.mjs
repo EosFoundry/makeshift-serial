@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 import {
   Events,
-  MakeShiftPort,
   Msg,
-  oStr,
+  nspct2,
   strfy,
   logRank,
+  setLogLevel,
+  loadDevices,
 } from '../lib/makeshift-serial.mjs';
 
 import * as readline from 'node:readline';
@@ -31,9 +32,9 @@ const argv = yargs(hideBin(process.argv))
 
 let lglv = argv.l
 
-console.log(argv)
+// console.log(argv)
 
-const msgen = new Msg({ host: 'Monitor', level: lglv })
+const msgen = new Msg({ host: 'Monitor', logLevel: lglv })
 const msg = msgen.getLevelLoggers().info
 
 // Setup Readline
@@ -43,36 +44,40 @@ rl.setPrompt("SEND => ");
 stdout.on('end', () => rl.prompt)
 
 // setup MakeShift
-const makeShift = new MakeShiftPort({
-  logOptions: { level: lglv }
-})
+setLogLevel(lglv)
 
-if (argv.i === true) {
-  function trawl(node) {
-    if (typeof node === 'string') {
-      msg(`trawled ${node}`)
-      makeShift.on(node, (data) => {
-        msg(`${node} :: ${oStr(data)}`)
-      })
-    } else {
-      for (const prop in node) {
-        trawl(node[prop])
-      }
-    }
-  }
-  trawl(Events)
-}
+let loadedDevices = await loadDevices()
+msg(`Loaded ${loadedDevices.length} devices: ${nspct2(loadedDevices)}`)
 
-// Attach readline to port when connection happens
-makeShift.on(Events.DEVICE.CONNECTED, () => {
-  msgen.host = 'Monitor::' + chalk.green(makeShift.devicePath)
-  rl.on('line', (line) => {
-    makeShift.write(line)
-  })
-})
 
-// Detach readline when disconnected
-makeShift.on(Events.DEVICE.DISCONNECTED, () => {
-  msgen.host = 'Monitor::' + chalk.yellow(makeShift.devicePath)
-  rl.removeAllListeners()
-})
+
+// if (argv.i === true) {
+//   function trawl(node) {
+//     if (typeof node === 'string') {
+//       msg(`Set up handler for ${node}`)
+//       makeShift.on(node, (data) => {
+//         msg(`${node} :: ${oStr(data)}`)
+//       })
+//     } else {
+//       for (const prop in node) {
+//         trawl(node[prop])
+//       }
+//     }
+//   }
+//   trawl(Events)
+// }
+//  msg('butt')
+
+// // Attach readline to port when connection happens
+// makeShift.on(Events.DEVICE.CONNECTED, () => {
+//   msgen.host = 'Monitor::' + chalk.green(makeShift.devicePath)
+//   rl.on('line', (line) => {
+//     makeShift.write(line)
+//   })
+// })
+
+// // Detach readline when disconnected
+// makeShift.on(Events.DEVICE.DISCONNECTED, () => {
+//   msgen.host = 'Monitor::' + chalk.yellow(makeShift.devicePath)
+//   rl.removeAllListeners()
+// })

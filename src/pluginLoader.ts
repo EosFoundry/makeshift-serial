@@ -32,7 +32,7 @@ export class Plugin extends EventEmitter implements Msger {
     public get logLevel(): LogLevel { return this._logLevel }
     public set logLevel(l: LogLevel) {
         this._logLevel = l
-        this._msgenerator.level = l
+        this._msgenerator.logLevel = l
     }
     private _msgenerator: Msg
     private log: MsgLvFunctorMap
@@ -84,7 +84,7 @@ export class Plugin extends EventEmitter implements Msger {
         this._functions = manifest.functions;
         this._msgenerator = new Msg({
             host: this.name,
-            level: 'none',
+            logLevel: 'none',
         })
         this.log = this._msgenerator.getLevelLoggers()
         this.log.info('Creating new event emitter');

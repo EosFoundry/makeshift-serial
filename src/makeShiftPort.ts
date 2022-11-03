@@ -2,15 +2,18 @@ import { SerialPort } from 'serialport'
 import { PortInfo } from '@serialport/bindings-interface'
 import { SlipEncoder, SlipDecoder } from '@serialport/parser-slip-encoder'
 import {
-  Msg, strfy, oStr, LogLevel, MsgLvFunctorMap, MsgOptions, Msger, LoggerFn, MsgLvStringMap
+  Msg, strfy, nspct2, LogLevel, MsgLvFunctorMap, MsgOptions, Msger, LoggerFn, MsgLvStringMap
 } from './msg'
 import { EventEmitter } from 'node:events'
 import { Buffer } from 'node:buffer'
-import { basename } from 'pathe'
+import { filename } from 'pathe/utils'
 import { nanoid } from 'nanoid'
 import chalk from 'chalk'
+import defu from 'defu'
+import { clearInterval, clearTimeout } from 'node:timers'
 
 let _connectedDevices = 0;
+const _keepAliveTimers: { [index: string]: any } = {}
 
 export enum PacketType {
   PING,
@@ -29,14 +32,20 @@ export type LogMessage = {
 }
 
 export type MakeShiftPortOptions = {
-  logOptions: MsgOptions
+  portPath: string,
+  portInfo: PortInfo,
+  logLevel: LogLevel,
+  /**
+   * this is automatically generated from nanoid if not given
+   */
+  id?: string,
 }
 
-export const makeShiftPortOptionsDefault: MakeShiftPortOptions = {
-  logOptions: {
-    level: 'all',
-    host: 'MSP(D/C)',
-  }
+export const defaultMakeShiftPortOptions = {
+  portPath: '',
+  portInfo: {},
+  logLevel: 'all' as LogLevel,
+  id: '',
 }
 
 
@@ -44,6 +53,7 @@ type MakeShiftState = {
   buttons: boolean[];
   dials: number[];
 }
+
 
 export class MakeShiftPort extends EventEmitter implements Msger {
   private serialPort: SerialPort
@@ -63,28 +73,16 @@ export class MakeShiftPort extends EventEmitter implements Msger {
   private _deviceReady = false
   private _id = ''
   private _deviceInfo: PortInfo | null
-  private _devicePath = 'D/C'
+  private _devicePath = ''
   private _msger: Msg
-  private log: MsgLvFunctorMap
-  private debug: Function
-  private info: Function
-  private error: Function
-  private warn: Function
-  private fatal: Function
 
-  public pollDelayMs: number = 500
   private _keepAliveTimeout: number = 5000
-  private _keepAliveDelayMs: number = 1500
+  private _keepAlivePollMs: number = 1500
   private keepAliveTimer: NodeJS.Timer
 
-  private _logLevel: LogLevel = 'all'
-  public get logLevel(): LogLevel { return this._logLevel }
-  public set logLevel(l: LogLevel) {
-    this._logLevel = l
-    this._msger.level = l
+  public get isOpen() {
+    return (typeof this.serialPort !== 'undefined' && this.serialPort.isOpen)
   }
-  public get logTermFormat() { return this._msger.terminal }
-  public set logTermFormat(tf: boolean) { this._msger.terminal = tf }
 
 
   // static get/setters
@@ -94,15 +92,53 @@ export class MakeShiftPort extends EventEmitter implements Msger {
   static get connectedDevices(): number { return _connectedDevices }
 
   // Public get/setters
+  //
   /**
-   * If device connected, returns the path as a string, else returns 'D/C'
+   * If device connected, returns the path as a string, else returns empty string 
    */
   public get devicePath(): string { return this._devicePath }
+  // public get scan() { return this._autoscan }
+  // public set scan(autoscan: boolean) {
+  //   this.debug(`setting scan to ${autoscan}`)
+  //   this._autoscan = autoscan
+  //   if (autoscan === true) {
+  //     this.scanForDevice()
+  //   }
+  // }
 
   /**
    * 23 character id assigned to port on instantiation
    */
   public get portId(): string { return this._id }
+
+  /**
+   * Logging related properties
+   */
+  private log: MsgLvFunctorMap
+  private debug: Function
+  private info: Function
+  private error: Function
+  private warn: Function
+  private fatal: Function
+
+  private get host(): string {
+    let str = `Port:${chalk.magenta(this.portId.slice(0, 4))}|`
+    if (this.isOpen) {
+      str += chalk.green(filename(this.devicePath))
+    } else {
+      str += chalk.yellow('D/C')
+    }
+    return str
+  }
+
+  private _logLevel: LogLevel = 'all'
+  public get logLevel(): LogLevel { return this._logLevel }
+  public set logLevel(l: LogLevel) {
+    this._logLevel = l
+    this._msger.logLevel = l
+  }
+  public get logTermFormat() { return this._msger.terminal }
+  public set logTermFormat(tf: boolean) { this._msger.terminal = tf }
 
   private emitLog: LoggerFn = (msg: string, lv: LogLevel) => {
     this.emit(Events.TERMINAL.LOG[lv], {
@@ -113,144 +149,182 @@ export class MakeShiftPort extends EventEmitter implements Msger {
     } as LogMessage)
   }
 
-  constructor(options = makeShiftPortOptionsDefault) {
+  // private assignOptions(setting, givenOptions) {
+  //   for (const prop in givenOptions) {
+  //     if (typeof setting[prop] !== 'object') {
+  //       setting[prop] = givenOptions[prop] || setting[prop]
+  //     } else {
+  //       this.assignOptions(setting[prop], givenOptions[prop])
+  //     }
+  //   }
+  // }
+
+  constructor(options = defaultMakeShiftPortOptions) {
     super()
-    this._id = nanoid(23)
-    this._msger = new Msg(options.logOptions)
-    this._msger.host = this.host()
+
+    const finalOpts = defu(options, defaultMakeShiftPortOptions);
+    // console.log(finalOpts)
+    this._id = finalOpts.id === '' ? nanoid(23) : finalOpts.id
+    this._devicePath = finalOpts.portPath
+
+    // set up logging
+    this._msger = new Msg()
+    this._msger.host = this.host
     this.log = this._msger.getLevelLoggers()
+
+    // assign logLevel after _msger initialization
+    this.logLevel = finalOpts.logLevel
     for (const lv in this.log) {
       this[lv] = (m: string) => {
+        // this bit wraps the loggers from Msg with an emitter
+        // so that all logging is also emitted as an event whether
+        // or not it gets logged to console
         const logString = this.log[lv](m)
         this.emitLog(logString, lv as LogLevel)
       }
     }
+    this.debug('Creating new MakeShiftPort with options: ' + nspct2(finalOpts))
 
-    this.on(Events.DEVICE.STATE_UPDATE, (currState: MakeShiftState) => {
-      for (let id = 0; id < NumOfButtons; id++) {
-        if (currState.buttons[id] != this.prevState.buttons[id]) {
-          let ev;
-          if (currState.buttons[id] === true) {
-            ev = Events.BUTTON[id].PRESSED
-          }
-          else {
-            ev = Events.BUTTON[id].RELEASED
-          }
-          this.emit(ev, currState.buttons[id]);
-          this.info(`${ev} with state ${currState.buttons[id]}`)
-        }
-      }
-      let delta
-      for (let id = 0; id < NumOfDials; id++) {
-        delta = this.prevState.dials[id] - currState.dials[id]
-        if (delta !== 0) {
-          let ev;
-          this.emit(Events.DIAL[id].CHANGE, currState.dials[id])
-          if (delta > 0) {
-            ev = Events.DIAL[id].INCREMENT
-          } else {
-            ev = Events.DIAL[id].DECREMENT
-          }
-          this.emit(ev, currState.dials[id])
-          this.info(`${ev} with state ${currState.dials[id]}`)
-        }
-      }
-      this.prevState = currState
-    })
 
+    // setup internal event handlers
+    this.on(Events.DEVICE.STATE_UPDATE, (cs) => { this.onStateUpdate(cs) })
+    // the timer only really exists here unfortunately
     this.on(Events.DEVICE.CONNECTED, () => {
-      _connectedDevices++
-      this._deviceReady = true;
-      this.timeSinceAck = Date.now()
-      this.info(`Device connection established`)
-      this.keepAliveTimer = setInterval(() => {
+      _keepAliveTimers[this.portId] = setInterval(() => {
         const elapsedTime = Date.now() - this.timeSinceAck
-        if (elapsedTime >= this._keepAliveDelayMs - 40) {
-          // this.msg(`${this._keepAliveDelayMs}ms keepalive check`)
+        if (elapsedTime >= this._keepAlivePollMs - 40) {
           if (elapsedTime > this._keepAliveTimeout) {
-            this.info(`Device unresponsive for ${this._keepAliveTimeout}ms, disconnecting`)
-            this.closePort()
+            this.debug(`kat- ${this.keepAliveTimer}`)
+            this.warn(`Device unresponsive for ${this._keepAliveTimeout}ms, disconnecting`)
+            this.close()
           } else {
             this.sendByte(PacketType.PING)
           }
         }
-      }, this._keepAliveDelayMs)
+      }, this._keepAlivePollMs)
     })
     this.on(Events.DEVICE.DISCONNECTED, () => {
-      _connectedDevices--
-      this._deviceReady = false;
-      this.info(`Restart device scanning`)
-      this.scanForDevice()
+      clearInterval(_keepAliveTimers[this.portId])
     })
-
 
     // The decoder is the endpoint which gets the 'raw' data from the makeshift
     // so all the work of parsing the raw data happens here
-    this.slipDecoder.on('data', (data: Buffer) => {
-      this.timeSinceAck = Date.now();
-      const header: PacketType = data.slice(0, 1).at(0)
-      const body = data.slice(1)
-      switch (header) {
-        case PacketType.STATE_UPDATE:
-          let newState = MakeShiftPort.parseStateFromBuffer(body)
-          this.emit(Events.DEVICE.STATE_UPDATE, newState)
-          break
-        case PacketType.ACK:
-          // any packet will act as keepalive ACK, and is handled above
-          this.debug(`Got ACK from MakeShift`)
-          break
-        case PacketType.STRING:
-          let d = new Date()
-          let s = "MKSHFT => "
-          s += d.getUTCHours()
-          s += ":"
-          s += d.getUTCMinutes()
-          s += ":"
-          s += d.getUTCSeconds()
-          s += ":"
-          s += d.getUTCMilliseconds()
-          console.log(s + ": " + body.toString())
-          break
-        case PacketType.PING:
-          this.debug(`Got PING from MakeShift, responding with ACK`)
-          this.sendByte(PacketType.ACK);
-          break
-        case PacketType.ERROR:
-          this.debug(`Got ERROR from MakeShift`)
-          break
-        case PacketType.READY:
-          this.debug(`Got READY from MakeShift`)
-          this.debug(body.toString())
-          this.emit(Events.DEVICE.CONNECTED)
-          break
-        default:
-          this.debug(header)
-          this.debug(data.toString())
-          break
-      }
-    }); // decoder -> console
+    this.slipDecoder.on('data', (d) => { this.onSlipDecoderData(d) }) // decoder -> console
 
-    this.scanForDevice()
+    this.open()
   } // constructor()
 
+  private onConnect() {
+  }
+
+  private onSlipDecoderData(data: Buffer) {
+    this.timeSinceAck = Date.now();
+    const header: PacketType = data.slice(0, 1).at(0)
+    const body = data.slice(1)
+    this.debug(nspct2(data))
+    switch (header) {
+      case PacketType.STATE_UPDATE: {
+        let newState = MakeShiftPort.parseStateFromBuffer(body)
+        this.emit(Events.DEVICE.STATE_UPDATE, newState)
+        break
+      }
+      case PacketType.ACK: {
+        // any other packet will also act as keepalive ACK, 
+        // and is handled above
+        this.debug(`Got ACK from MakeShift`)
+        break
+      }
+      case PacketType.STRING: {
+        this.debug(body.toString())
+        break
+      }
+      case PacketType.PING: {
+        this.debug(`Got PING from MakeShift, responding with ACK`)
+        this.sendByte(PacketType.ACK);
+        break
+      }
+      case PacketType.ERROR: {
+        this.debug(`Got ERROR from MakeShift`)
+        break
+      }
+      case PacketType.READY: {
+        this.debug(`Got READY from MakeShift`)
+        this.debug(body.toString())
+        _connectedDevices++
+        this._deviceReady = true;
+        this.timeSinceAck = Date.now()
+        this.info(`Device connection established`)
+        this.emit(Events.DEVICE.CONNECTED)
+        break
+      }
+      default: {
+        this.debug(header)
+        this.debug(data.toString())
+        break
+      }
+    }
+  }
+
+  private onStateUpdate(currState: MakeShiftState) {
+    for (let id = 0; id < NumOfButtons; id++) {
+      if (currState.buttons[id] != this.prevState.buttons[id]) {
+        let ev;
+        if (currState.buttons[id] === true) {
+          ev = Events.BUTTON[id].PRESSED
+        }
+        else {
+          ev = Events.BUTTON[id].RELEASED
+        }
+        this.emit(ev, currState.buttons[id]);
+        this.info(`${ev} with state ${currState.buttons[id]}`)
+      }
+    }
+    let delta
+    for (let id = 0; id < NumOfDials; id++) {
+      delta = this.prevState.dials[id] - currState.dials[id]
+      if (delta !== 0) {
+        let ev;
+        this.emit(Events.DIAL[id].CHANGE, currState.dials[id])
+        if (delta > 0) {
+          ev = Events.DIAL[id].INCREMENT
+        } else {
+          ev = Events.DIAL[id].DECREMENT
+        }
+        this.emit(ev, currState.dials[id])
+        this.info(`${ev} with state ${currState.dials[id]}`)
+      }
+    }
+    this.prevState = currState
+
+  }
+
+
   private sendByte(t: PacketType): void {
-    if (this.serialPort.isOpen) {
-      this.serialPort.flush()
-      let buf = Buffer.from([t])
-      this.debug(`Sending byte: ${oStr(buf)}`)
-      this.slipEncoder.write(buf)
+    if (this.isOpen) {
+      try {
+        this.serialPort.flush()
+        let buf = Buffer.from([t])
+        this.debug(`Sending byte: ${nspct2(buf)}`)
+        this.slipEncoder.write(buf)
+      } catch (e) {
+        this.error(e)
+      }
     }
   }
 
   private send(t: PacketType, body: string): void {
-    if (this.serialPort.isOpen) {
-      this.serialPort.flush()
-      let h = Buffer.from([t])
-      let b = Buffer.from(body)
-      const buf = Buffer.concat([h, b]);
-      this.debug(`Sending buffer: ${oStr(buf)}`)
-      // console.dir(buf)
-      this.slipEncoder.write(buf)
+    if (this.isOpen) {
+      try {
+        this.serialPort.flush()
+        let h = Buffer.from([t])
+        let b = Buffer.from(body)
+        const buf = Buffer.concat([h, b]);
+        this.debug(`Sending buffer: ${nspct2(buf)}`)
+        // console.dir(buf)
+        this.slipEncoder.write(buf)
+      } catch (e) {
+        this.error(e)
+      }
     }
   }
 
@@ -263,7 +337,8 @@ export class MakeShiftPort extends EventEmitter implements Msger {
 
     const buttonsRaw = data.slice(0, 2).reverse()
     const dialsRaw = data.slice(2, 18)
-    const bytesToBin = (button: number, bitCounter: number) => {
+
+    function bytesToBin(button: number, bitCounter: number) {
       if (bitCounter === 0) { return; }
       if (button % 2) {
         state.buttons.push(true)
@@ -282,20 +357,18 @@ export class MakeShiftPort extends EventEmitter implements Msger {
     return state
   }
 
-  openPort(path: string, info: PortInfo): void {
-    this.serialPort = new SerialPort({
-      path: path,
+  async open() {
+    this.serialPort = await new SerialPort({
+      path: this.devicePath,
       baudRate: 42069
     }, (e) => {
       if (e != null) {
         this.error(`Something happened while opening port: `)
         this.error(e);
-
-        this.info('Restarting scan for open ports...')
-        setTimeout(() => { this.scanForDevice() }, this.pollDelayMs);
+        // this.info('Restarting scan for open ports...')
+        // setTimeout(() => { this.scanForDevice() }, this.pollDelayMs);
       } else {
-        this._devicePath = path
-        this._msger.host = this.host()
+        this._msger.host = this.host
         this.info('SerialPort opened, attaching SLIP translators')
         this.slipEncoder.pipe(this.serialPort) // node -> teensy
         this.serialPort.pipe(this.slipDecoder) // teensy -> decoder
@@ -304,28 +377,27 @@ export class MakeShiftPort extends EventEmitter implements Msger {
     })
   }
 
-  closePort() {
+  close() {
     this.info(`Closing MakeShift port...`)
-    this.info(`Clearing keepalive timer`)
-    clearInterval(this.keepAliveTimer)
+    clearInterval(_keepAliveTimers[this.portId])
     this.info(`Unpiping encoders`)
     this.slipEncoder.unpipe()
     this.serialPort.unpipe()
-    if (this.serialPort.isOpen) {
+    if (this.isOpen) {
       this.info(`Port object found open`)
       this.info(`Sending disconnect packet`)
       this.sendByte(PacketType.DISCONNECT)
       this.info(`Closing port`)
       this.serialPort.close()
     }
+    this._msger.host = this.host
+    _connectedDevices--
+    this._deviceReady = false;
     this.info(`Port closed, sending disconnect signal`)
     this.emit(Events.DEVICE.DISCONNECTED)
-    this.info(`Resetting devicePath`)
-    this._devicePath = 'D/C'
-    this._msger.host = this.host()
   }
 
-  write(line: string): void {
+  write = (line: string): void => {
     if (this._deviceReady) {
       this.send(PacketType.STRING, line)
     } else {
@@ -333,44 +405,41 @@ export class MakeShiftPort extends EventEmitter implements Msger {
     }
   }
 
-  scanForDevice() {
-    SerialPort.list().then((portList) => {
-      portList.forEach(portInfo => {
-        this.debug(oStr(portInfo))
-      })
+  // private scanForDevice = () => {
+  //   this.debug(`scanForDevice called with scan set to ${this.scan}`)
+  //   if (this.scan === false) {
+  //     return
+  //   }
 
-      let makeShiftPortInfo = portList.filter((portInfo) => {
-        return ((portInfo.vendorId === '16c0'
-          || portInfo.vendorId === '16C0')
-          && (portInfo.productId === '0483'))
-      })
+  //   SerialPort.list().then((portList) => {
+  //     portList.forEach(portInfo => {
+  //       this.debug(oStr(portInfo))
+  //     })
 
-      // console.dir(makeShiftPortInfo.length)
+  //     let makeShiftPortInfo = portList.filter((portInfo) => {
+  //       return ((portInfo.vendorId === '16c0'
+  //         || portInfo.vendorId === '16C0')
+  //         && (portInfo.productId === '0483'))
+  //     })
 
-      if (makeShiftPortInfo.length > 0) {
-        this.debug(`Found MakeShift devices: ${strfy(makeShiftPortInfo)}`)
-        let path = makeShiftPortInfo[0].path
-        this.emit(Events.DEVICE.FOUND, path)
-        this.info(`Opening device with path '${path}'`)
-        this.openPort(path, makeShiftPortInfo[0])
-      } else {
-        this.debug(`No MakeShift devices found, continuing scan...`)
-        setTimeout(() => { this.scanForDevice() }, this.pollDelayMs);
-      }
-    }).catch((e) => {
-      this.info(e)
-    })
-  }
+  //     // console.dir(makeShiftPortInfo.length)
+
+  //     if (makeShiftPortInfo.length > 0) {
+  //       this.debug(`Found MakeShift devices: ${strfy(makeShiftPortInfo)}`)
+  //       let path = makeShiftPortInfo[0].path
+  //       this.emit(Events.DEVICE.FOUND, path)
+  //       this.info(`Opening device with path '${path}'`)
+  //       this.openPort(path, makeShiftPortInfo[0])
+  //     } else {
+  //       this.debug(`No MakeShift devices found, continuing scan...`)
+  //       setTimeout(() => { this.scanForDevice() }, this.pollDelayMs);
+  //     }
+  //   }).catch((e) => {
+  //     this.info(e)
+  //   })
+  // }
 
 
-  // TODO: figure if this is vestigal
-  host() {
-    let wrap = chalk.yellow
-    if (this._devicePath !== 'D/C') {
-      wrap = chalk.green
-    }
-    return `MSP::${wrap(this.devicePath)}`
-  }
 }
 
 // Long constants

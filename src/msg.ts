@@ -1,4 +1,5 @@
 import { stat } from "fs";
+import { defu } from 'defu'
 import { inspect } from 'node:util'
 import chalk, { ChalkInstance } from 'chalk'
 import { InspectOptions } from "util";
@@ -42,12 +43,26 @@ export type MsgLvStringMap = {
 
 export type MsgOptions = {
   host?: string,
-  level?: LogLevel,
+  logLevel?: LogLevel,
   logger?: Function,
   prompt?: string,
   showTime?: boolean,
   symbol?: MsgLvStringMap,
   terminal?: boolean,
+}
+export const defaultMsgOptions: MsgOptions = {
+  host: '',
+  logLevel: 'all',
+  prompt: ' => ',
+  showTime: true,
+  symbol: {
+    debug: 'dbg',
+    info: '',
+    warn: '(!)',
+    error: '[!]',
+    fatal: '{x_X}',
+  } as MsgLvStringMap,
+  terminal: true,
 }
 
 const colorize: MsgLvFunctorMap = {
@@ -67,7 +82,14 @@ export function setWarn(warnFn: ChalkInstance) {
 
 export function strfy(o) { return JSON.stringify(o, null, 2) }
 
-export function oStr(o: any): string {
+export function nspect(o:any, d:number): string {
+  return inspect(o, {
+    colors: true,
+    depth: d,
+  } as InspectOptions)
+
+}
+export function nspct2(o: any): string {
   return inspect(o, {
     colors: true,
     depth: 2
@@ -87,7 +109,7 @@ export class Msg {
 
   prompt: string = ' => '
   host: string = ''
-  level: LogLevel = 'all'
+  logLevel: LogLevel = 'all'
   terminal: boolean = true
   showTime: boolean = true
   showMillis: boolean = false
@@ -128,20 +150,16 @@ export class Msg {
     return _ps
   }
 
-  symbol: MsgLvStringMap = {
-    debug: 'debug',
-    info: '',
-    warn: '(!)',
-    error: '[!]',
-    fatal: '{x_X}',
-  }
+  symbol: MsgLvStringMap
 
-  private assignOptions(depth, opts) {
-    for (const prop in opts) {
-      if (typeof depth[prop] !== 'object') {
-        depth[prop] = opts[prop] || depth[prop]
+  private assignOptions(setting, givenOptions) {
+    for (const prop in givenOptions) {
+      if (typeof setting[prop] !== 'object') {
+        // console.log('set:: ' + setting[prop])
+        // console.log('giv:: ' + givenOptions[prop])
+        setting[prop] = givenOptions[prop] || setting[prop]
       } else {
-        this.assignOptions(depth[prop], opts[prop])
+        this.assignOptions(setting[prop], givenOptions[prop])
       }
     }
   }
@@ -160,8 +178,9 @@ export class Msg {
   logger: LoggerFn = this._defaultLogger
   resetLogger() { this.logger = this._defaultLogger }
 
-  constructor(options: MsgOptions) {
-    this.assignOptions(this, options)
+  constructor(options: MsgOptions = defaultMsgOptions) {
+    const finalOpts = defu(options, defaultMsgOptions)
+    this.assignOptions(this, finalOpts)
     // if (options.symbol) {
     //   for (let prop in this._symbol) {
     //     this._symbol[prop] = options.symbol[prop]
@@ -183,7 +202,7 @@ export class Msg {
 
       this['_' + prop] = (l) => {
         const logString = `${this.ps(calledLevel)}${l}`
-        if (logRank[this.level] <= logRank[calledLevel]) {
+        if (logRank[this.logLevel] <= logRank[calledLevel]) {
           this.logger(logString, calledLevel)
         }
         return logString
@@ -191,3 +210,4 @@ export class Msg {
     }
   }
 };
+

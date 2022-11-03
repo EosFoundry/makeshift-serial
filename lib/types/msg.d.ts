@@ -23,17 +23,19 @@ export declare type MsgLvStringMap = {
 };
 export declare type MsgOptions = {
     host?: string;
-    level?: LogLevel;
+    logLevel?: LogLevel;
     logger?: Function;
     prompt?: string;
     showTime?: boolean;
     symbol?: MsgLvStringMap;
     terminal?: boolean;
 };
+export declare const defaultMsgOptions: MsgOptions;
 export declare function setColorize(level: LogLevel, colorFn: ChalkInstance): void;
 export declare function setWarn(warnFn: ChalkInstance): void;
 export declare function strfy(o: any): string;
-export declare function oStr(o: any): string;
+export declare function nspect(o: any, d: number): string;
+export declare function nspct2(o: any): string;
 export declare class Msg {
     private _debug;
     private _info;
@@ -43,7 +45,7 @@ export declare class Msg {
     private _defaultLogger;
     prompt: string;
     host: string;
-    level: LogLevel;
+    logLevel: LogLevel;
     terminal: boolean;
     showTime: boolean;
     showMillis: boolean;
@@ -54,6 +56,6 @@ export declare class Msg {
     getLevelLoggers(): MsgLvFunctorMap;
     logger: LoggerFn;
     resetLogger(): void;
-    constructor(options: MsgOptions);
+    constructor(options?: MsgOptions);
     private spawnLevelLoggers;
 }

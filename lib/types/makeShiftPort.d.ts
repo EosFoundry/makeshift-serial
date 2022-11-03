@@ -1,7 +1,7 @@
 /// <reference types="node" />
 /// <reference types="node" />
 import { PortInfo } from '@serialport/bindings-interface';
-import { LogLevel, MsgOptions, Msger, MsgLvStringMap } from './msg';
+import { LogLevel, Msger, MsgLvStringMap } from './msg';
 import { EventEmitter } from 'node:events';
 import { Buffer } from 'node:buffer';
 export declare enum PacketType {
@@ -19,9 +19,20 @@ export declare type LogMessage = {
     buffer: Buffer;
 };
 export declare type MakeShiftPortOptions = {
-    logOptions: MsgOptions;
+    portPath: string;
+    portInfo: PortInfo;
+    logLevel: LogLevel;
+    /**
+     * this is automatically generated from nanoid if not given
+     */
+    id?: string;
 };
-export declare const makeShiftPortOptionsDefault: MakeShiftPortOptions;
+export declare const defaultMakeShiftPortOptions: {
+    portPath: string;
+    portInfo: {};
+    logLevel: LogLevel;
+    id: string;
+};
 declare type MakeShiftState = {
     buttons: boolean[];
     dials: number[];
@@ -37,43 +48,53 @@ export declare class MakeShiftPort extends EventEmitter implements Msger {
     private _deviceInfo;
     private _devicePath;
     private _msger;
-    private log;
-    private debug;
-    private info;
-    private error;
-    private warn;
-    private fatal;
-    pollDelayMs: number;
     private _keepAliveTimeout;
-    private _keepAliveDelayMs;
+    private _keepAlivePollMs;
     private keepAliveTimer;
-    private _logLevel;
-    get logLevel(): LogLevel;
-    set logLevel(l: LogLevel);
-    get logTermFormat(): boolean;
-    set logTermFormat(tf: boolean);
+    get isOpen(): boolean;
     /**
      * This technically is a library global, it keeps track of the number of open ports
      */
     static get connectedDevices(): number;
     /**
-     * If device connected, returns the path as a string, else returns 'D/C'
+     * If device connected, returns the path as a string, else returns empty string
      */
     get devicePath(): string;
     /**
      * 23 character id assigned to port on instantiation
      */
     get portId(): string;
+    /**
+     * Logging related properties
+     */
+    private log;
+    private debug;
+    private info;
+    private error;
+    private warn;
+    private fatal;
+    private get host();
+    private _logLevel;
+    get logLevel(): LogLevel;
+    set logLevel(l: LogLevel);
+    get logTermFormat(): boolean;
+    set logTermFormat(tf: boolean);
     private emitLog;
-    constructor(options?: MakeShiftPortOptions);
+    constructor(options?: {
+        portPath: string;
+        portInfo: {};
+        logLevel: LogLevel;
+        id: string;
+    });
+    private onConnect;
+    private onSlipDecoderData;
+    private onStateUpdate;
     private sendByte;
     private send;
     static parseStateFromBuffer(data: Buffer): MakeShiftState;
-    openPort(path: string, info: PortInfo): void;
-    closePort(): void;
-    write(line: string): void;
-    scanForDevice(): void;
-    host(): string;
+    open(): Promise<void>;
+    close(): void;
+    write: (line: string) => void;
 }
 /**
  * Events are organized so they are accessible as:
