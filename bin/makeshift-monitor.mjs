@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import {
+  Ports,
   Msg,
   nspct2,
   strfy,
@@ -9,6 +10,9 @@ import {
   setShowTime,
   startAutoScan,
   stopAutoScan,
+  PortAuthority,
+  PortAuthorityEvents,
+  getPortFingerPrintSnapShot,
 } from '../lib/makeshift-serial.mjs';
 
 import * as readline from 'node:readline';
@@ -19,9 +23,12 @@ import chalk from 'chalk'
 
 const lstring = JSON.stringify(Object.keys(logRank), null, " ").slice(1, -1).replace(/\n/g, "").replace(/\"/g, '')
 const argv = yargs(hideBin(process.argv))
+  .scriptName('makeshift-monitor')
   .usage('Usage: $0 [args]')
   .boolean(['i', 't'])
   .string('l')
+  .default('i', false)
+  .default('t', false)
   .default('l', 'info')
   .alias('i', 'inspect')
   .alias('l', 'log-level')
@@ -34,11 +41,12 @@ const argv = yargs(hideBin(process.argv))
   .help('h')
   .argv
 
-let lglv = argv.l
+const logLevel = argv.l
+const showTime = argv.t
 
-// console.log(argv)
+// console.dir(argv)
 
-const msgen = new Msg({ host: 'Monitor', logLevel: lglv })
+const msgen = new Msg({ host: 'Monitor', logLevel: logLevel })
 const log = msgen.getLevelLoggers()
 const msg = log.info
 
@@ -47,8 +55,8 @@ const msg = log.info
 const rl = readline.createInterface({ input: stdin, tabSize: 4, output: stdout });
 
 // setup PortAuthority settings
-setShowTime(argv.t)
-setLogLevel(lglv)
+setShowTime(showTime)
+setLogLevel(logLevel)
 
 // do the needful
 log.event(`Starting PortAuthority scan...`)

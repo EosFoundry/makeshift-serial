@@ -14,11 +14,16 @@ import { PortInfo } from '@serialport/bindings-interface'
 import { EventEmitter } from 'node:events'
 
 /**
- * The object that contains all connected instances of {@link MakeShiftPort}
+ * This object contains all connected instances of {@link MakeShiftPort}
  * It is updated as devices connect and disconnect.
  */
 export const Ports: { [index: string]: MakeShiftPort } = {}
 let portFingerPrints: MakeShiftPortFingerprint[] = []
+
+/**
+ * {@link EventEmitter} that handles {@link PortAuthorityEvents} callbacks
+ */
+export const PortAuthority = new EventEmitter()
 
 let logLevel: LogLevel = 'info'
 let showTime = false
@@ -29,7 +34,6 @@ let scannerTimeout: NodeJS.Timeout;
 let keepAliveTimeMs: number = 5000
 let keepAlivePollTimeMs: number = 1500
 const keepAliveTimers: { [index: string]: NodeJS.Timeout } = {};
-const PortAuthority = new EventEmitter()
 const Msger = new Msg({ host: 'PortAuthority', logLevel: 'info' })
 Msger.logLevel = logLevel
 Msger.showTime = showTime

@@ -1,12 +1,18 @@
+/// <reference types="node" />
 import { MakeShiftPort, MakeShiftPortFingerprint } from './makeShiftPort';
 import { LogLevel } from './msg';
+import { EventEmitter } from 'node:events';
 /**
- * The object that contains all connected instances of {@link MakeShiftPort}
+ * This object contains all connected instances of {@link MakeShiftPort}
  * It is updated as devices connect and disconnect.
  */
 export declare const Ports: {
     [index: string]: MakeShiftPort;
 };
+/**
+ * {@link EventEmitter} that handles {@link PortAuthorityEvents} callbacks
+ */
+export declare const PortAuthority: EventEmitter;
 /**
  * Sets the autoscanner into action, scanning every {@link scanDelayMs}
  *
