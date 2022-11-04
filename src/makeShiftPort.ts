@@ -141,6 +141,7 @@ export class MakeShiftPort extends EventEmitter implements Msger {
   private log: MsgLvFunctorMap
   private debug: Function
   private info: Function
+  private deviceEvent: Function
   private warn: Function
   private error: Function
   private fatal: Function
@@ -245,7 +246,7 @@ export class MakeShiftPort extends EventEmitter implements Msger {
         _connectedDevices++
         this._deviceReady = true;
         this._prevAckTime = Date.now()
-        this.log.event(`Device connection established`)
+        this.deviceEvent(`Device connection established`)
         this.emit(DeviceEvents.DEVICE.CONNECTED, this.fingerPrint)
         break
       }
@@ -270,7 +271,7 @@ export class MakeShiftPort extends EventEmitter implements Msger {
           ev = DeviceEvents.BUTTON[id].RELEASED
         }
         this.emit(ev, currState.buttons[id]);
-        this.log.event(`${ev} with state ${currState.buttons[id]}`)
+        this.deviceEvent(`${ev} with state ${currState.buttons[id]}`)
       }
     }
     let delta
@@ -285,7 +286,7 @@ export class MakeShiftPort extends EventEmitter implements Msger {
           ev = DeviceEvents.DIAL[id].DECREMENT
         }
         this.emit(ev, currState.dials[id])
-        this.log.event(`${ev} with state ${currState.dials[id]}`)
+        this.deviceEvent(`${ev} with state ${currState.dials[id]}`)
       }
     }
     this.prevState = currState
@@ -531,7 +532,7 @@ export const DeviceEvents = {
       fatal: 'makeshift-serial-log-fatal',
       error: 'makeshift-serial-log-error',
       warn: 'makeshift-serial-log-warn',
-      event: 'makeshift-serial-log-event',
+      deviceEvent: 'makeshift-serial-log-event',
       info: 'makeshift-serial-log-info',
       debug: 'makeshift-serial-log-debug',
       all: 'makeshift-serial-log-any',

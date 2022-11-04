@@ -76,6 +76,7 @@ export declare class MakeShiftPort extends EventEmitter implements Msger {
     private log;
     private debug;
     private info;
+    private deviceEvent;
     private warn;
     private error;
     private fatal;

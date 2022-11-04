@@ -59,7 +59,7 @@ setShowTime(showTime)
 setLogLevel(logLevel)
 
 // do the needful
-log.event(`Starting PortAuthority scan...`)
+log.deviceEvent(`Starting PortAuthority scan...`)
 startAutoScan()
 
 

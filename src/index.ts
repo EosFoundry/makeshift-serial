@@ -173,7 +173,7 @@ function openPort(portInfo: PortInfo) {
   portFingerPrints.push(fp)
   Ports[id].ping()
   setKeepAliveTimeout(id)
-  log.event(`Opened port: ${fp.deviceSerial} | ${fp.devicePath}`)
+  log.deviceEvent(`Opened port: ${fp.deviceSerial} | ${fp.devicePath}`)
   PortAuthority.emit(PortAuthorityEvents.port.opened, fp)
 }
 
