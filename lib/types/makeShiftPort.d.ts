@@ -18,20 +18,26 @@ export declare type LogMessage = {
     message: string;
     buffer: Buffer;
 };
+export declare type MakeShiftPortFingerprint = {
+    time: number;
+    devicePath: string;
+    portId: string;
+    deviceSerial: string;
+};
 export declare type MakeShiftPortOptions = {
-    portPath: string;
     portInfo: PortInfo;
     logLevel: LogLevel;
     /**
      * this is automatically generated from nanoid if not given
      */
     id?: string;
+    showTime?: boolean;
 };
 export declare const defaultMakeShiftPortOptions: {
-    portPath: string;
-    portInfo: {};
+    portInfo: PortInfo;
     logLevel: LogLevel;
     id: string;
+    showTime: boolean;
 };
 declare type MakeShiftState = {
     buttons: boolean[];
@@ -41,16 +47,14 @@ export declare class MakeShiftPort extends EventEmitter implements Msger {
     private serialPort;
     private slipEncoder;
     private slipDecoder;
-    private timeSinceAck;
+    private _prevAckTime;
     private prevState;
     private _deviceReady;
     private _id;
-    private _deviceInfo;
-    private _devicePath;
+    private _portInfo;
     private _msger;
-    private _keepAliveTimeout;
-    private _keepAlivePollMs;
     private keepAliveTimer;
+    get prevAckTime(): number;
     get isOpen(): boolean;
     /**
      * This technically is a library global, it keeps track of the number of open ports
@@ -60,6 +64,9 @@ export declare class MakeShiftPort extends EventEmitter implements Msger {
      * If device connected, returns the path as a string, else returns empty string
      */
     get devicePath(): string;
+    get deviceSerial(): string;
+    get fingerPrint(): MakeShiftPortFingerprint;
+    get portInfo(): PortInfo | null;
     /**
      * 23 character id assigned to port on instantiation
      */
@@ -70,37 +77,37 @@ export declare class MakeShiftPort extends EventEmitter implements Msger {
     private log;
     private debug;
     private info;
-    private error;
     private warn;
+    private error;
     private fatal;
     private get host();
     private _logLevel;
+    get showTime(): boolean;
+    set showTime(show: boolean);
     get logLevel(): LogLevel;
     set logLevel(l: LogLevel);
     get logTermFormat(): boolean;
     set logTermFormat(tf: boolean);
     private emitLog;
-    constructor(options?: {
-        portPath: string;
-        portInfo: {};
-        logLevel: LogLevel;
-        id: string;
-    });
-    private onConnect;
+    constructor(options: MakeShiftPortOptions);
     private onSlipDecoderData;
+    ping(): void;
     private onStateUpdate;
     private sendByte;
     private send;
     static parseStateFromBuffer(data: Buffer): MakeShiftState;
-    open(): Promise<void>;
+    private open;
     close(): void;
     write: (line: string) => void;
 }
 /**
+ * This constant encodes the MakeShitEvent API, this is done to avoid typing
+ * long strings as much as possible, and to allow tooling to do its job
+ *
  * Events are organized so they are accessible as:
  *     Events.<EventSource>[?pseudo-id].SubType?
 */
-export declare const Events: {
+export declare const DeviceEvents: {
     DIAL: {
         INCREMENT: string;
         DECREMENT: string;
@@ -112,7 +119,6 @@ export declare const Events: {
         CHANGE: string;
     }[];
     DEVICE: {
-        FOUND: string;
         DISCONNECTED: string;
         CONNECTED: string;
         /**
@@ -123,9 +129,12 @@ export declare const Events: {
          */
         STATE_UPDATE: string;
     };
-    TERMINAL: {
-        LOG: MsgLvStringMap;
+    /**
+     * Reverts to regular casing for non-hardware events
+     */
+    Terminal: {
+        Log: MsgLvStringMap;
     };
 };
-export declare type MakeShiftEvents = typeof Events;
+export declare type MakeShiftDeviceEvents = typeof DeviceEvents;
 export {};

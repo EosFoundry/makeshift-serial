@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 import {
-  Events,
   Msg,
   nspct2,
   strfy,
   logRank,
   setLogLevel,
-  loadDevices,
+  setPortAuthorityLogLevel,
+  setShowTime,
+  startScan,
+  stopScan,
 } from '../lib/makeshift-serial.mjs';
 
 import * as readline from 'node:readline';
@@ -17,15 +19,17 @@ import chalk from 'chalk'
 
 const lstring = JSON.stringify(Object.keys(logRank), null, " ").slice(1, -1).replace(/\n/g, "").replace(/\"/g, '')
 const argv = yargs(hideBin(process.argv))
-  .usage('Usage: $0 -l [string] -i')
-  .boolean('i')
+  .usage('Usage: $0 [args]')
+  .boolean(['i', 't'])
   .string('l')
   .default('l', 'info')
   .alias('i', 'inspect')
   .alias('l', 'log-level')
+  .alias('t', 'timestamp')
   .alias('h', 'help')
   .describe('l', `Sets the log level. Accepted: ${lstring}`)
   .describe('i', 'Logs the event objects recieved.')
+  .describe('t', 'Set log messages to have a timestamp')
   .describe('h', 'Show this message')
   .help('h')
   .argv
@@ -35,19 +39,21 @@ let lglv = argv.l
 // console.log(argv)
 
 const msgen = new Msg({ host: 'Monitor', logLevel: lglv })
-const msg = msgen.getLevelLoggers().info
+const log = msgen.getLevelLoggers()
+const msg = log.info
+
 
 // Setup Readline
 const rl = readline.createInterface({ input: stdin, tabSize: 4, output: stdout });
-rl.setPrompt("SEND => ");
 
-stdout.on('end', () => rl.prompt)
-
-// setup MakeShift
+// setup PortAuthority settings
+setShowTime(argv.t)
 setLogLevel(lglv)
 
-let loadedDevices = await loadDevices()
-msg(`Loaded ${loadedDevices.length} devices: ${nspct2(loadedDevices)}`)
+// do the needful
+log.event(`Starting PortAuthority scan...`)
+startScan()
+
 
 
 

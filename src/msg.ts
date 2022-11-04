@@ -14,6 +14,7 @@ export type MsgLevel =
   'fatal'
   | 'error'
   | 'warn'
+  | 'event'
   | 'info'
   | 'debug'
 export type LogLevel = 'none' | 'all' | MsgLevel
@@ -22,9 +23,10 @@ export const logRank = {
   'all': 0,
   'debug': 1,
   'info': 2,
-  'warn': 3,
-  'error': 4,
-  'fatal': 5,
+  'event': 3,
+  'warn': 4,
+  'error': 5,
+  'fatal': 98,
   'none': 99,
 }
 export interface Msger {
@@ -58,6 +60,7 @@ export const defaultMsgOptions: MsgOptions = {
   symbol: {
     debug: 'dbg',
     info: '',
+    event: '',
     warn: '(!)',
     error: '[!]',
     fatal: '{x_X}',
@@ -68,6 +71,7 @@ export const defaultMsgOptions: MsgOptions = {
 const colorize: MsgLvFunctorMap = {
   debug: chalk.gray,
   info: chalk.white,
+  event: chalk.green,
   warn: chalk.yellow,
   error: chalk.red,
   fatal: chalk.redBright,
@@ -99,6 +103,7 @@ export class Msg {
 
   private _debug = () => { }
   private _info = () => { }
+  private _event = () => { }
   private _warn = () => { }
   private _error = () => { }
   private _fatal = () => { }
@@ -169,6 +174,7 @@ export class Msg {
     return {
       debug: this._debug,
       info: this._info,
+      event: this._event,
       warn: this._warn,
       error: this._error,
       fatal: this._fatal,

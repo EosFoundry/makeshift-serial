@@ -1,11 +1,12 @@
 import { ChalkInstance } from 'chalk';
 export declare function filterName(input: any): any;
-export declare type MsgLevel = 'fatal' | 'error' | 'warn' | 'info' | 'debug';
+export declare type MsgLevel = 'fatal' | 'error' | 'warn' | 'event' | 'info' | 'debug';
 export declare type LogLevel = 'none' | 'all' | MsgLevel;
 export declare const logRank: {
     all: number;
     debug: number;
     info: number;
+    event: number;
     warn: number;
     error: number;
     fatal: number;
@@ -39,6 +40,7 @@ export declare function nspct2(o: any): string;
 export declare class Msg {
     private _debug;
     private _info;
+    private _event;
     private _warn;
     private _error;
     private _fatal;

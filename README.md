@@ -8,7 +8,13 @@ This library manages connections and communications between a nodejs runtime and
 npm install @eos-makeshift/serial
 ```
 
+If you'd like to install it globally as a cli tool, you can pass the `-g` or `--global` flag to the install command.
+
 ## Usage
+
+This library comes with a cli executable as well as a library that can be called in nodejs environments. Currently it relies on [`serialport`](https://github.com/serialport/node-serialport) to function, so it is not easily usable in a website without some serious fiddling.
+
+### From the CLI
 
 Calling commandline monitoring tool (assuming it is not installed globally):
 
@@ -16,20 +22,38 @@ Calling commandline monitoring tool (assuming it is not installed globally):
 npx makeshift-monitor
 ```
 
-Import and create instance:
+### Use as javascript library
+
+Import and scan for devices:
 
 ```js
-import { Events, MakeShiftPort } from '@eos-makeshift/serial'
+import { Devices, Events, startScan } from '@eos-makeshift/serial'
 
-const device = new MakeShiftPort()
+startScan()
+```
+
+By default, the library outputs logs events into the console, you can turn this off or set different levels with `setLogLevel()`
+
+```js
+setLogLevel('info')
 ```
 
 Adding callbacks for dial turn events:
 
 ```js
+import { Devices, Events, startScan } from '@eos-makeshift/serial'
+// Three different events for dials
+
 // state: number
-// Two different events for buttons
-device.on(Events.DIALS[0], (state) => {
+Devices[id].on(Events.DIALS[0].DECREMENT, (state) => {
+  console.log(state)
+})
+
+Devices[id].on(Events.DIALS[0].INCREMENT, (state) => {
+  console.log(state)
+})
+
+Devices[id].on(Events.DIALS[0].CHANGED, (state) => {
   console.log(state)
 })
 ```
@@ -37,12 +61,13 @@ device.on(Events.DIALS[0], (state) => {
 Callback examples for button press events:
 
 ```js
+import { Devices, Events, startScan } from '@eos-makeshift/serial'
 // state: boolean
 // Two different events for buttons (what's a half A-press!?)
-device.on(Events.BUTTONS[0].PRESSED, (state) => {
+Devices[id].on(Events.BUTTONS[0].PRESSED, (state) => {
   console.log(state)
 })
-device.on(Events.BUTTONS[0].RELEASED, (state) => {
+Devices[id].on(Events.BUTTONS[0].RELEASED, (state) => {
   console.log(state)
 })
 ```
