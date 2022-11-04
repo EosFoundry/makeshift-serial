@@ -160,7 +160,7 @@ function openPort(portInfo: PortInfo) {
     }
   }
   // if no devices with given path is found, a new device is created
-  const id = nanoid(23)
+  const id = portInfo.serialNumber
   const options = {
     portInfo: portInfo,
     id: id,
