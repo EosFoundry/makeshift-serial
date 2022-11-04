@@ -13,7 +13,12 @@ import { nanoid } from 'nanoid'
 import { PortInfo } from '@serialport/bindings-interface'
 import { EventEmitter } from 'node:events'
 
-export const Devices: { [index: string]: MakeShiftPort } = {}
+/**
+ * The object that contains all connected instances of {@link MakeShiftPort}
+ * It is updated as devices connect and disconnect.
+ */
+export const Ports: { [index: string]: MakeShiftPort } = {}
+let portFingerPrints: MakeShiftPortFingerprint[] = []
 
 let logLevel: LogLevel = 'info'
 let showTime = false
@@ -30,32 +35,77 @@ Msger.logLevel = logLevel
 Msger.showTime = showTime
 const log = Msger.getLevelLoggers()
 
-export function setShowTime(s: boolean) {
-  showTime = s
-  Msger.showTime = s
-  for (const id in Devices) {
-    Devices[id].showTime = s
-  }
-}
-
-export function setLogLevel(lv: LogLevel) {
-  logLevel = lv;
-  for (const id in Devices) {
-    Devices[id].logLevel = lv
-  }
-}
-export function setPortAuthorityLogLevel(lv: LogLevel) {
-  Msger.logLevel = lv
-}
-
-export function stopScan() {
-  autoscan = false;
-}
-
-export function startScan() {
+/**
+ * Sets the autoscanner into action, scanning every {@link scanDelayMs}
+ *  
+ * This should be the default way of calling for most cases, device connection status
+ * should be tracked with {@link PortAuthorityEvents}
+ */
+export function startAutoScan(): void {
   autoscan = true;
   setScannerTimeout();
 }
+
+/**
+ * Turns off auto scanning, does not stop any in progress {@link scan()} calls.
+ * 
+ * i.e. there is no guarantee that there will be no new devices between calling
+ * and the next check of {@link Ports}
+ */
+export function stopAutoScan(): void {
+  autoscan = false;
+}
+
+/**
+ * Calls the scanner once
+ */
+export function scanOnce(): void {
+  autoscan = false;
+  scan()
+}
+
+export function getPortFingerPrintSnapShot(): MakeShiftPortFingerprint[] {
+  return portFingerPrints
+}
+
+/**
+ * Sets the timestamp of the logging messages to be visible or not
+ * @param s - state of showTime variable
+ */
+export function setShowTime(s: boolean): void {
+  showTime = s
+  Msger.showTime = s
+  for (const id in Ports) {
+    Ports[id].showTime = s
+  }
+}
+
+/**
+ * Sets the logging level of all MakeShiftPort instances in {@link Ports}
+ * @param lv - desired {@link LogLevel}
+ */
+export function setLogLevel(lv: LogLevel): void {
+  logLevel = lv;
+  for (const id in Ports) {
+    Ports[id].logLevel = lv
+  }
+}
+
+export function setPortLogLevel(portId: string, lv: LogLevel): void {
+  if (typeof Ports[portId] !== 'undefined') {
+    Ports[portId].logLevel = lv
+  }
+}
+
+/**
+ * Sets the logging level of PortAuthority
+ * 
+ * @param lv - desired {@link LogLevel}
+ */
+export function setPortAuthorityLogLevel(lv: LogLevel): void {
+  Msger.logLevel = lv
+}
+
 
 function setScannerTimeout() {
   scannerTimeout = setTimeout(() => { scan() }, scanDelayMs)
@@ -67,38 +117,41 @@ function setKeepAliveTimeout(portId: string) {
 }
 
 function checkAlive(portId) {
-  const elapsedTime = Date.now() - Devices[portId].prevAckTime
+  const elapsedTime = Date.now() - Ports[portId].prevAckTime
   log.debug(`elapsedTime since prevAckTime: ${elapsedTime}`)
   if (elapsedTime > keepAliveTimeMs) {
     clearTimeout(keepAliveTimers[portId])
     log.debug(`Timer handle - ${keepAliveTimers[portId]}`)
-    log.warn(`Device ${portId}::${Devices[portId].devicePath} unresponsive for ${keepAliveTimeMs}ms, disconnecting`)
+    log.warn(`Device ${portId}::${Ports[portId].devicePath} unresponsive for ${keepAliveTimeMs}ms, disconnecting`)
     closePort(portId)
   } else {
     if (elapsedTime >= keepAlivePollTimeMs - 40) {
-      Devices[portId].ping()
+      Ports[portId].ping()
     }
     setKeepAliveTimeout(portId)
   }
 }
 
 function closePort(id: string) {
-  if (typeof Devices[id] !== 'undefined') {
-    const fp = Devices[id].fingerPrint
-    Devices[id].close()
-    delete Devices[id]
+  if (typeof Ports[id] !== 'undefined') {
+    const fp = Ports[id].fingerPrint
+    portFingerPrints = portFingerPrints.filter(existingfp => {
+      return (
+        fp.devicePath !== existingfp.devicePath &&
+        fp.deviceSerial !== existingfp.deviceSerial
+      )
+    })
+    Ports[id].close()
+    delete Ports[id]
     PortAuthority.emit(PortAuthorityEvents.port.closed, fp)
-    if (autoscan && Object.keys(Devices).length === 0) {
-      setScannerTimeout()
-    }
   }
 }
 
 function openPort(portInfo: PortInfo) {
-  // check if any of the ports have been opened already
+  // check if any of the port is already open
   const path = portInfo.path
-  for (const id in Devices) {
-    if (Devices[id].devicePath === path) {
+  for (const id in Ports) {
+    if (Ports[id].devicePath === path) {
       return
     }
   }
@@ -111,9 +164,13 @@ function openPort(portInfo: PortInfo) {
     showTime: showTime,
   }
   log.info(`Opening device with options: '${nspect(options, 1)}'`)
-  Devices[id] = new MakeShiftPort(options)
-  Devices[id].ping()
+  Ports[id] = new MakeShiftPort(options)
+  const fp = Ports[id].fingerPrint
+  portFingerPrints.push(fp)
+  Ports[id].ping()
   setKeepAliveTimeout(id)
+  log.event(`Opened port: ${fp.deviceSerial} | ${fp.devicePath}`)
+  PortAuthority.emit(PortAuthorityEvents.port.opened, fp)
 }
 
 async function scan() {
@@ -134,8 +191,9 @@ async function scan() {
     log.debug(`Found MakeShift devices: ${nspct2(foundMakeShiftPorts)}`)
 
     if (foundMakeShiftPorts.length > 0) {
-      foundMakeShiftPorts.forEach((portInfo) => openPort(portInfo))
-    } else if (autoscan) {
+      foundMakeShiftPorts.forEach((portInfo) => { openPort(portInfo) })
+    }
+    if (autoscan) {
       setScannerTimeout()
     } else { PortAuthority.emit(PortAuthorityEvents.scan.stopped) }
   } catch (e) {
@@ -143,6 +201,10 @@ async function scan() {
   }
 }
 
+/**
+ * MakeShiftPortAuthorityEvents API defined here, to avoid typing strings as
+ * much as possible
+ */
 export const PortAuthorityEvents = {
   port: {
     opened: 'makeshift-pa-port-opened',

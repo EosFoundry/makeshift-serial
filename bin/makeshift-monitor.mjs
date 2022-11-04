@@ -7,8 +7,8 @@ import {
   setLogLevel,
   setPortAuthorityLogLevel,
   setShowTime,
-  startScan,
-  stopScan,
+  startAutoScan,
+  stopAutoScan,
 } from '../lib/makeshift-serial.mjs';
 
 import * as readline from 'node:readline';
@@ -52,7 +52,7 @@ setLogLevel(lglv)
 
 // do the needful
 log.event(`Starting PortAuthority scan...`)
-startScan()
+startAutoScan()
 
 
 

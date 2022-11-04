@@ -19,7 +19,6 @@ export declare type LogMessage = {
     buffer: Buffer;
 };
 export declare type MakeShiftPortFingerprint = {
-    time: number;
     devicePath: string;
     portId: string;
     deviceSerial: string;

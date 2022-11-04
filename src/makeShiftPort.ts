@@ -30,7 +30,6 @@ export type LogMessage = {
 }
 
 export type MakeShiftPortFingerprint = {
-  time: number,
   devicePath: string,
   portId: string,
   deviceSerial: string,
@@ -117,7 +116,6 @@ export class MakeShiftPort extends EventEmitter implements Msger {
   }
   public get fingerPrint(): MakeShiftPortFingerprint {
     return {
-      time: Date.now(),
       devicePath: this.devicePath,
       deviceSerial: this.deviceSerial,
       portId: this.portId,
@@ -386,7 +384,7 @@ export class MakeShiftPort extends EventEmitter implements Msger {
     this._msger.host = this.host
     _connectedDevices--
     this._deviceReady = false;
-    this.log.event(`Port closed, sending disconnect signal`)
+    this.warn(`Port closed, sending disconnect signal`)
     this.emit(DeviceEvents.DEVICE.DISCONNECTED, this.fingerPrint)
   }
 
