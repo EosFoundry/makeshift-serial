@@ -1,7 +1,7 @@
 import * as path  from 'path';
 import { send } from 'process';
 import { Message, sendMessage } from './messages'
-import { Msg, strfy } from './msg'
+import { Msg, strfy } from '@eos-makeshift/msg'
 
 let msgHost:Msg;
 let msg: Function;

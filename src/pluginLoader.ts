@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { EventEmitter } from 'node:events';
 
-import { filterName, LogLevel, Msg, Msger, MsgLvFunctorMap, strfy } from './msg'
+import { filterName, LogLevel, Msg, Msger, MsgLvFunctorMap, strfy } from '@eos-makeshift/msg'
 const msgen = new Msg({ host: 'PluginLoader' });
 const log = msgen.getLevelLoggers()
 const msg = log.info

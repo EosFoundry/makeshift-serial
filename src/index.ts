@@ -8,7 +8,7 @@
 
 import { SerialPort } from 'serialport'
 import { DeviceEvents, MakeShiftPort, MakeShiftPortFingerprint } from './makeShiftPort'
-import { LogLevel, Msg, nspct2, nspect } from './msg'
+import { LogLevel, Msg, nspct2, nspect } from '@eos-makeshift/msg'
 import { nanoid } from 'nanoid'
 import { PortInfo } from '@serialport/bindings-interface'
 import { EventEmitter } from 'node:events'
@@ -34,7 +34,7 @@ let scannerTimeout: NodeJS.Timeout;
 let keepAliveTimeMs: number = 5000
 let keepAlivePollTimeMs: number = 1500
 const keepAliveTimers: { [index: string]: NodeJS.Timeout } = {};
-const Msger = new Msg({ host: 'PortAuthority', logLevel: 'info' })
+const Msger = new Msg({ host: 'PortAuthority', logLevel: 'info', showTime: false,})
 Msger.logLevel = logLevel
 Msger.showTime = showTime
 const log = Msger.getLevelLoggers()
@@ -222,4 +222,3 @@ export const PortAuthorityEvents = {
 export type MakeShiftPortAuthorityEvents = typeof PortAuthorityEvents
 
 export * from './makeShiftPort'
-export * from './msg'

@@ -3,7 +3,7 @@ import { PortInfo } from '@serialport/bindings-interface'
 import { SlipEncoder, SlipDecoder } from '@serialport/parser-slip-encoder'
 import {
   Msg, strfy, nspct2, LogLevel, MsgLvFunctorMap, MsgOptions, Msger, LoggerFn, MsgLvStringMap
-} from './msg'
+} from '@eos-makeshift/msg'
 import { EventEmitter } from 'node:events'
 import { Buffer } from 'node:buffer'
 import { filename } from 'pathe/utils'

@@ -1,7 +1,7 @@
 /// <reference types="node" />
 /// <reference types="node" />
 import { PortInfo } from '@serialport/bindings-interface';
-import { LogLevel, Msger, MsgLvStringMap } from './msg';
+import { LogLevel, Msger, MsgLvStringMap } from '@eos-makeshift/msg';
 import { EventEmitter } from 'node:events';
 import { Buffer } from 'node:buffer';
 export declare enum PacketType {

@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import { MakeShiftPort, MakeShiftPortFingerprint } from './makeShiftPort';
-import { LogLevel } from './msg';
+import { LogLevel } from '@eos-makeshift/msg';
 import { EventEmitter } from 'node:events';
 /**
  * This object contains all connected instances of {@link MakeShiftPort}
@@ -65,4 +65,3 @@ export declare const PortAuthorityEvents: {
 };
 export declare type MakeShiftPortAuthorityEvents = typeof PortAuthorityEvents;
 export * from './makeShiftPort';
-export * from './msg';

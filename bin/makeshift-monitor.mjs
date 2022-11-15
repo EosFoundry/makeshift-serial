@@ -1,10 +1,6 @@
 #!/usr/bin/env node
 import {
   Ports,
-  Msg,
-  nspct2,
-  strfy,
-  logRank,
   setLogLevel,
   setPortAuthorityLogLevel,
   setShowTime,
@@ -15,11 +11,16 @@ import {
   getPortFingerPrintSnapShot,
 } from '../lib/makeshift-serial.mjs';
 
+import {
+  Msg,
+  nspct2,
+  strfy,
+  logRank,
+} from '@eos-makeshift/msg'
 import * as readline from 'node:readline';
 import { stdin, stdout } from 'node:process';
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
-import chalk from 'chalk'
 
 const lstring = JSON.stringify(Object.keys(logRank), null, " ").slice(1, -1).replace(/\n/g, "").replace(/\"/g, '')
 const argv = yargs(hideBin(process.argv))
@@ -46,7 +47,11 @@ const showTime = argv.t
 
 // console.dir(argv)
 
-const msgen = new Msg({ host: 'Monitor', logLevel: logLevel })
+const msgen = new Msg({
+  host: 'Monitor',
+  logLevel: logLevel,
+  showTime: showTime
+})
 const log = msgen.getLevelLoggers()
 const msg = log.info
 

@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import { EventEmitter } from 'node:events';
-import { LogLevel, Msger } from './msg';
+import { LogLevel, Msger } from '@eos-makeshift/msg';
 import { Message } from './messages.js';
 export declare class Plugin extends EventEmitter implements Msger {
     private _id;
