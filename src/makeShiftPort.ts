@@ -218,7 +218,7 @@ export class MakeShiftPort extends EventEmitter implements Msger {
       case PacketType.STATE_UPDATE: {
         let newState = MakeShiftPort.parseStateFromBuffer(body)
         this.emit(DeviceEvents.DEVICE.STATE_UPDATE, newState)
-        this.onStateUpdate(newState)
+        this.handleStateUpdate(newState)
         break
       }
       case PacketType.ACK: {
@@ -260,7 +260,7 @@ export class MakeShiftPort extends EventEmitter implements Msger {
 
   ping() { this.sendByte(PacketType.PING) }
 
-  private onStateUpdate(currState: MakeShiftState) {
+  private handleStateUpdate(currState: MakeShiftState) {
     for (let id = 0; id < NumOfButtons; id++) {
       if (currState.buttons[id] != this.prevState.buttons[id]) {
         let ev;
@@ -520,7 +520,7 @@ export const DeviceEvents = {
      * This event is emitted from a raw device signal, and contains *all* the
      * data from a state update. Unless you are doing a spot of hacking on this
      * library, It's likely more useful to listen to specific input events:
-     * - @see Events.BUTTON or @see Events.DIAL 
+     * - see {@link DeviceEvents.BUTTON} or {@link DeviceEvents.DIAL}
      */
     STATE_UPDATE: 'state-update',
   },
@@ -541,6 +541,23 @@ export const DeviceEvents = {
 }
 export type MakeShiftDeviceEvents = typeof DeviceEvents
 
+function flattenEmitterApi(obj) {
+  const ret = []
+  for (const key in obj) {
+    if (typeof obj[key] === 'string') {
+      return obj[key]
+    } else {
+      const subArr = flattenEmitterApi(obj[key])
+      if (Array.isArray(subArr)) {
+        ret.push(...subArr)
+      } else {
+        ret.push(subArr)
+      }
+    }
+  }
+  return ret
+}
+export const DeviceEventsFlat = flattenEmitterApi(DeviceEvents)
 
 const NumOfButtons = DeviceEvents.BUTTON.length;
 

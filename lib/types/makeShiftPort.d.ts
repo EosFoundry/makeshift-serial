@@ -92,7 +92,7 @@ export declare class MakeShiftPort extends EventEmitter implements Msger {
     constructor(options: MakeShiftPortOptions);
     private onSlipDecoderData;
     ping(): void;
-    private onStateUpdate;
+    private handleStateUpdate;
     private sendByte;
     private send;
     static parseStateFromBuffer(data: Buffer): MakeShiftState;
@@ -125,7 +125,7 @@ export declare const DeviceEvents: {
          * This event is emitted from a raw device signal, and contains *all* the
          * data from a state update. Unless you are doing a spot of hacking on this
          * library, It's likely more useful to listen to specific input events:
-         * - @see Events.BUTTON or @see Events.DIAL
+         * - see {@link DeviceEvents.BUTTON} or {@link DeviceEvents.DIAL}
          */
         STATE_UPDATE: string;
     };
@@ -137,4 +137,5 @@ export declare const DeviceEvents: {
     };
 };
 export declare type MakeShiftDeviceEvents = typeof DeviceEvents;
+export declare const DeviceEventsFlat: any;
 export {};
