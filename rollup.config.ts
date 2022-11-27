@@ -19,7 +19,9 @@ export default {
     },
   ],
   plugins: [
-    typescript({ // this is a workaround
+    typescript({ 
+      // this is a workaround for 
+      // https://github.com/rollup/plugins/issues/1253
       tsconfig: false,
       "include": [
         "./src/*"
