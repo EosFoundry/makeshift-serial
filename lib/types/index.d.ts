@@ -63,5 +63,5 @@ export declare const PortAuthorityEvents: {
         stopped: string;
     };
 };
-export declare type MakeShiftPortAuthorityEvents = typeof PortAuthorityEvents;
+export type MakeShiftPortAuthorityEvents = typeof PortAuthorityEvents;
 export * from './makeShiftPort';

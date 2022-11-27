@@ -13,17 +13,17 @@ export declare enum PacketType {
     STRING = 5,
     DISCONNECT = 6
 }
-export declare type LogMessage = {
+export type LogMessage = {
     level: LogLevel;
     message: string;
     buffer: Buffer;
 };
-export declare type MakeShiftPortFingerprint = {
+export type MakeShiftPortFingerprint = {
     devicePath: string;
     portId: string;
     deviceSerial: string;
 };
-export declare type MakeShiftPortOptions = {
+export type MakeShiftPortOptions = {
     portInfo: PortInfo;
     logLevel: LogLevel;
     /**
@@ -38,7 +38,7 @@ export declare const defaultMakeShiftPortOptions: {
     id: string;
     showTime: boolean;
 };
-declare type MakeShiftState = {
+type MakeShiftState = {
     buttons: boolean[];
     dials: number[];
 };
@@ -75,8 +75,8 @@ export declare class MakeShiftPort extends EventEmitter implements Msger {
      */
     private log;
     private debug;
-    private info;
     private deviceEvent;
+    private info;
     private warn;
     private error;
     private fatal;
@@ -136,6 +136,6 @@ export declare const DeviceEvents: {
         Log: MsgLvStringMap;
     };
 };
-export declare type MakeShiftDeviceEvents = typeof DeviceEvents;
+export type MakeShiftDeviceEvents = typeof DeviceEvents;
 export declare const DeviceEventsFlat: any;
 export {};

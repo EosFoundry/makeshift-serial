@@ -140,8 +140,8 @@ export class MakeShiftPort extends EventEmitter implements Msger {
    */
   private log: MsgLvFunctorMap
   private debug: Function
-  private info: Function
   private deviceEvent: Function
+  private info: Function
   private warn: Function
   private error: Function
   private fatal: Function

@@ -1,4 +1,4 @@
-export declare type Message = {
+export type Message = {
     label: string;
     data: any;
 };
