@@ -19,7 +19,23 @@ export default {
     },
   ],
   plugins: [
-    typescript({ tsconfig: './tsconfig.json' }),
+    typescript({ // this is a workaround
+      tsconfig: false,
+      "include": [
+        "./src/*"
+      ],
+      "exclude": [
+        "./lib",
+      ],
+      "compilerOptions": {
+        "module": "ESNext",
+        "target": "ESNext",
+        "resolveJsonModule": true,
+        "moduleResolution": "node",
+        "allowSyntheticDefaultImports": true,
+        "declaration": false,
+      },
+    }),
     nodeResolve({
       exportConditions: ['node'],
     }),
