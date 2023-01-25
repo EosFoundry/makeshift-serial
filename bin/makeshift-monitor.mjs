@@ -45,13 +45,16 @@ const argv = yargs(hideBin(process.argv))
 const logLevel = argv.l
 const showTime = argv.t
 
-// console.dir(argv)
+console.dir(argv)
 
-const msgen = new Msg({
+console.dir(logLevel)
+const toast = {
   host: 'Monitor',
   logLevel: logLevel,
   showTime: showTime
-})
+}
+console.dir(toast)
+const msgen = new Msg(toast)
 const log = msgen.getLevelLoggers()
 const msg = log.info
 

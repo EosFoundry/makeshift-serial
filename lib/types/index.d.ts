@@ -10,18 +10,22 @@ export declare const Ports: {
     [index: string]: MakeShiftPort;
 };
 /**
- * {@link EventEmitter} that handles {@link PortAuthorityEvents} callbacks
+ * NodeJS {@link https://nodejs.org/api/events.html#emitteroneventname-listener EventEmitter}
+ * that handles {@link PortAuthorityEvents} callbacks
+ *
  */
 export declare const PortAuthority: EventEmitter;
+export declare let scanDelayMs: number;
 /**
- * Sets the autoscanner into action, scanning every {@link scanDelayMs}
+ * Turns on the autoscanner, polling for a MakeShift Device every {@link scanDelayMs}
  *
- * This should be the default way of calling for most cases, device connection status
- * should be tracked with {@link PortAuthorityEvents}
+ * This should be the default way of finding a device for most cases, device
+ * connection status can be tracked with {@link PortAuthorityEvents}
+ *
  */
 export declare function startAutoScan(): void;
 /**
- * Turns off auto scanning, does not stop any in progress {@link scan()} calls.
+ * Turns off auto scanning, does not stop any scans in progress.
  *
  * i.e. there is no guarantee that there will be no new devices between calling
  * and the next check of {@link Ports}
@@ -65,3 +69,4 @@ export declare const PortAuthorityEvents: {
 };
 export type MakeShiftPortAuthorityEvents = typeof PortAuthorityEvents;
 export * from './makeShiftPort';
+export { LogLevel, Msg, nspct2, nspect } from '@eos-makeshift/msg';

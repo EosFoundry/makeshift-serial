@@ -53,7 +53,7 @@ export const defaultMakeShiftPortOptions = {
 }
 
 
-type MakeShiftState = {
+export type MakeShiftState = {
   buttons: boolean[];
   dials: number[];
 }
@@ -405,7 +405,7 @@ export class MakeShiftPort extends EventEmitter implements Msger {
  * long strings as much as possible, and to allow tooling to do its job
  *
  * Events are organized so they are accessible as:
- *     Events.<EventSource>[?pseudo-id].SubType?
+ *     Events.DIAL[0].INCREMENT
 */
 export const DeviceEvents = {
   DIAL: [
@@ -518,9 +518,10 @@ export const DeviceEvents = {
     CONNECTED: 'makeshift-connect',
     /**
      * This event is emitted from a raw device signal, and contains *all* the
-     * data from a state update. Unless you are doing a spot of hacking on this
-     * library, It's likely more useful to listen to specific input events:
-     * - see {@link DeviceEvents.BUTTON} or {@link DeviceEvents.DIAL}
+     * data from a state update. This is useful when hacking on this library as
+     * it provides a ton of event information. For most purposes , it will likely
+     * be more useful to listen to specific input events -
+     * i.e. DeviceEvents.BUTTON[1].INCREMENT
      */
     STATE_UPDATE: 'state-update',
   },

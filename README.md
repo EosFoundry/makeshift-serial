@@ -32,35 +32,46 @@ makeshift-monitor --help
 The TL;DR verison:
 
 ```js
+// kitchen sink of do stuff
 import { 
+
+  // core functionality
   PortAuthority,
-  PortAuthorityEvents, 
   Ports,
+  startAutoScan,
+
+  // available events
+  PortAuthorityEvents, 
   DeviceEvents,
+  
+  // logging utilities
   setLogLevel,
   setPortAuthorityLogLevel
+  
 } from '@eos-makeshift/serial'
+
+setLogLevel('all')
+setPortAuthorityLogLevel('all')
 
 let makeShiftPortId;
 
-PortAuthority.on(PortAuthorityEvents.port.opened,
-  // Ports[portId] is accessible at the time this callback function runs
-  (fp) => {
-    const makeShiftFp = Ports[fp.portId].fingerPrint
-    makeShiftPortId = makeShiftFp.portId
-    console.dir(fp)
-    console.dir(makeShiftFp)
-    
-    Ports[makeShiftPortId].on(DeviceEvents.BUTTON[4].PRESSED,
-      () => { chickenChicken() }
-    )
-  }
-)
-
-function chickenChicken() {
+function runsWhenPressed() {
   // chicken chicken chicken
   console.log('chicken chicken chicken')
 }
+
+function handlePortOpen (fp) {
+  const makeShiftFp = Ports[fp.portId].fingerPrint
+  makeShiftPortId = makeShiftFp.portId
+
+  Ports[makeShiftPortId].on(DeviceEvents.BUTTON[4].PRESSED, runsWhenPressed)
+}
+
+// Listen for connection event and attach the handler
+PortAuthority.on(PortAuthorityEvents.port.opened, handlePortOpen)
+
+// After event handling is set up, start autoscan to find a MakeShift device
+startAutoScan()
 ```
 
 Import and set up event handlers:
@@ -70,8 +81,6 @@ import {
   PortAuthority,
   PortAuthorityEvents, 
   Ports,
-  setLogLevel,
-  setPortAuthorityLogLevel
 } from '@eos-makeshift/serial'
 
 PortAuthority.on(PortAuthorityEvents.port.opened,
