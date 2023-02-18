@@ -21,14 +21,16 @@ export const Ports: { [index: string]: MakeShiftPort } = {}
 let portFingerPrints: MakeShiftPortFingerprint[] = []
 
 /**
- * {@link EventEmitter} that handles {@link PortAuthorityEvents} callbacks
+ * NodeJS {@link https://nodejs.org/api/events.html#emitteroneventname-listener EventEmitter}
+ * that handles {@link PortAuthorityEvents} callbacks
+ *
  */
 export const PortAuthority = new EventEmitter()
 
 let logLevel: LogLevel = 'info'
 let showTime = false
 let autoscan = true
-let scanDelayMs = 1000
+export let scanDelayMs = 1000
 let scannerTimeout: NodeJS.Timeout;
 
 let keepAliveTimeMs: number = 5000
@@ -40,10 +42,11 @@ Msger.showTime = showTime
 const log = Msger.getLevelLoggers()
 
 /**
- * Sets the autoscanner into action, scanning every {@link scanDelayMs}
+ * Turns on the autoscanner, polling for a MakeShift Device every {@link scanDelayMs}
  *  
- * This should be the default way of calling for most cases, device connection status
- * should be tracked with {@link PortAuthorityEvents}
+ * This should be the default way of finding a device for most cases, device
+ * connection status can be tracked with {@link PortAuthorityEvents}
+ *
  */
 export function startAutoScan(): void {
   autoscan = true;
@@ -51,7 +54,7 @@ export function startAutoScan(): void {
 }
 
 /**
- * Turns off auto scanning, does not stop any in progress {@link scan()} calls.
+ * Turns off auto scanning, does not stop any scans in progress.
  * 
  * i.e. there is no guarantee that there will be no new devices between calling
  * and the next check of {@link Ports}
@@ -90,6 +93,7 @@ export function setShowTime(s: boolean): void {
  */
 export function setLogLevel(lv: LogLevel): void {
   logLevel = lv;
+  Msger.logLevel = lv
   for (const id in Ports) {
     Ports[id].logLevel = lv
   }
@@ -182,8 +186,13 @@ function openPort(portInfo: PortInfo) {
   PortAuthority.emit(PortAuthorityEvents.port.opened, fp)
 }
 
+/**
+ * Internal function, this function normally runs via a setScannerTimeout()
+ * call to allow timed asyncronous scanning that can be turned on and off
+ * via external events.
+ */
 async function scan() {
-  log.debug(`scanForDevice called with scan set to ${autoscan}`)
+  log.debug(`scanForDevice called with autoscan set to ${autoscan}`)
   try {
     const portList = await SerialPort.list()
     portList.forEach(portInfo => {
@@ -227,3 +236,6 @@ export const PortAuthorityEvents = {
 export type MakeShiftPortAuthorityEvents = typeof PortAuthorityEvents
 
 export * from './makeShiftPort'
+
+// export for documentation?
+export { LogLevel, Msg, nspct2, nspect } from '@eos-makeshift/msg'
