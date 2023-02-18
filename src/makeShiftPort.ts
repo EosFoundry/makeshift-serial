@@ -213,7 +213,7 @@ export class MakeShiftPort extends EventEmitter implements Msger {
     this._prevAckTime = Date.now();
     const header: PacketType = data.slice(0, 1).at(0)
     const body = data.slice(1)
-    this.debug(nspct2(data))
+    this.debug(data)
     switch (header) {
       case PacketType.STATE_UPDATE: {
         let newState = MakeShiftPort.parseStateFromBuffer(body)

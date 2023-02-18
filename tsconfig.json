@@ -6,16 +6,16 @@
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "declaration": true,
-    "declarationDir": "./lib/types",
+    "declarationDir": "./lib/types"
   },
   "typedocOptions": {
     "entryPoints": ["./src/index.ts"],
-    "out": "docs",
+    "out": "docs"
   },
   "include": [
-    "./src/*",
+    "./src/*"
   ],
   "exclude": [
-    "./lib",
-  ],
+    "./lib"
+  ]
 }

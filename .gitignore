@@ -4,6 +4,7 @@ tmp/
 
 # Tooling/IDE stuff
 .volarrc
+.rollup.cache/
 
 # VScode vue plugin
 env.d.ts

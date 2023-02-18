@@ -34,7 +34,7 @@ let scannerTimeout: NodeJS.Timeout;
 let keepAliveTimeMs: number = 5000
 let keepAlivePollTimeMs: number = 1500
 const keepAliveTimers: { [index: string]: NodeJS.Timeout } = {};
-const Msger = new Msg({ host: 'PortAuthority', logLevel: 'info', showTime: false,})
+const Msger = new Msg({ host: 'PortAuthority', logLevel: 'info', showTime: false, })
 Msger.logLevel = logLevel
 Msger.showTime = showTime
 const log = Msger.getLevelLoggers()
@@ -117,16 +117,21 @@ function setScannerTimeout() {
 }
 
 function setKeepAliveTimeout(portId: string) {
-  keepAliveTimers[portId] = setTimeout(() => { checkAlive(portId) }, keepAlivePollTimeMs)
+  keepAliveTimers[portId] = setTimeout(() => { 
+    checkAlive(portId) 
+  }, keepAlivePollTimeMs)
 }
 
 function checkAlive(portId) {
   const elapsedTime = Date.now() - Ports[portId].prevAckTime
   log.debug(`elapsedTime since prevAckTime: ${elapsedTime}`)
+
   if (elapsedTime > keepAliveTimeMs) {
     clearTimeout(keepAliveTimers[portId])
+
     log.debug(`Timer handle - ${keepAliveTimers[portId]}`)
     log.warn(`Device ${portId}::${Ports[portId].devicePath} unresponsive for ${keepAliveTimeMs}ms, disconnecting`)
+
     closePort(portId)
   } else {
     if (elapsedTime >= keepAlivePollTimeMs - 40) {
@@ -137,18 +142,18 @@ function checkAlive(portId) {
 }
 
 function closePort(id: string) {
-  if (typeof Ports[id] !== 'undefined') {
-    const fp = Ports[id].fingerPrint
-    portFingerPrints = portFingerPrints.filter(existingfp => {
-      return (
-        fp.devicePath !== existingfp.devicePath &&
-        fp.deviceSerial !== existingfp.deviceSerial
-      )
-    })
-    Ports[id].close()
-    delete Ports[id]
-    PortAuthority.emit(PortAuthorityEvents.port.closed, fp)
-  }
+  if (typeof Ports[id] === 'undefined') { return }
+
+  const fp = Ports[id].fingerPrint
+  portFingerPrints = portFingerPrints.filter(existingfp => {
+    return (
+      fp.devicePath !== existingfp.devicePath &&
+      fp.deviceSerial !== existingfp.deviceSerial
+    )
+  })
+  Ports[id].close()
+  delete Ports[id]
+  PortAuthority.emit(PortAuthorityEvents.port.closed, fp)
 }
 
 function openPort(portInfo: PortInfo) {
