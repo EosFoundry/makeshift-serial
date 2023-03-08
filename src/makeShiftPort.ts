@@ -270,22 +270,22 @@ export class MakeShiftPort extends EventEmitter implements Msger {
         else {
           ev = DeviceEvents.BUTTON[id].RELEASED
         }
-        this.emit(ev, currState.buttons[id]);
+        this.emit(ev, { state: currState.buttons[id], event: ev });
         this.deviceEvent(`${ev} with state ${currState.buttons[id]}`)
       }
     }
     let delta
     for (let id = 0; id < NumOfDials; id++) {
-      delta = currState.dials[id] - this.prevState.dials[id] 
+      delta = currState.dials[id] - this.prevState.dials[id]
       if (delta !== 0) {
         let ev;
-        this.emit(DeviceEvents.DIAL[id].CHANGE, currState.dials[id])
+        this.emit(DeviceEvents.DIAL[id].CHANGE, {state: currState.dials[id], event:ev})
         if (delta > 0) {
           ev = DeviceEvents.DIAL[id].INCREMENT
         } else {
           ev = DeviceEvents.DIAL[id].DECREMENT
         }
-        this.emit(ev, currState.dials[id])
+        this.emit(ev, {state: currState.dials[id], event:ev})
         this.deviceEvent(`${ev} with state ${currState.dials[id]}`)
       }
     }
