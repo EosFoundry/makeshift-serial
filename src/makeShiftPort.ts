@@ -204,15 +204,15 @@ export class MakeShiftPort extends EventEmitter implements Msger {
 
     // The decoder is the endpoint which gets the 'raw' data from the makeshift
     // so all the work of parsing the raw data happens here
-    this.slipDecoder.on('data', (d) => { this.onSlipDecoderData(d) }) // decoder -> console
+    this.slipDecoder.on('data', (d) => { this.parseSlipPacketHeader(d) }) // decoder -> console
 
     this.open()
   } // constructor()
 
-  private onSlipDecoderData(data: Buffer) {
+  private parseSlipPacketHeader(data: Buffer) {
     this._prevAckTime = Date.now();
-    const header: PacketType = data.slice(0, 1).at(0)
-    const body = data.slice(1)
+    const header: PacketType = data.subarray(0, 1).at(0)
+    const body = data.subarray(1)
     this.debug(data)
     switch (header) {
       case PacketType.STATE_UPDATE: {
@@ -329,8 +329,8 @@ export class MakeShiftPort extends EventEmitter implements Msger {
       dials: [],
     }
 
-    const buttonsRaw = data.slice(0, 2).reverse()
-    const dialsRaw = data.slice(2, 18)
+    const buttonsRaw = data.subarray(0, 2).reverse()
+    const dialsRaw = data.subarray(2, 18)
 
     function bytesToBin(button: number, bitCounter: number) {
       if (bitCounter === 0) { return; }

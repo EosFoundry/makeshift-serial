@@ -90,7 +90,7 @@ export declare class MakeShiftPort extends EventEmitter implements Msger {
     set logTermFormat(tf: boolean);
     private emitLog;
     constructor(options: MakeShiftPortOptions);
-    private onSlipDecoderData;
+    private parseSlipPacketHeader;
     ping(): void;
     private handleStateUpdate;
     private sendByte;
