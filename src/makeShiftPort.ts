@@ -56,6 +56,7 @@ export const defaultMakeShiftPortOptions = {
 export type MakeShiftState = {
   buttons: boolean[];
   dials: number[];
+  dialsRelative: number[];
 }
 
 
@@ -73,6 +74,7 @@ export class MakeShiftPort extends EventEmitter implements Msger {
       false, false, false, false,
     ],
     dials: [0, 0, 0, 0],
+    dialsRelative: [0, 0, 0, 0],
   }
 
   private _deviceReady = false
@@ -270,22 +272,22 @@ export class MakeShiftPort extends EventEmitter implements Msger {
         else {
           ev = DeviceEvents.BUTTON[id].RELEASED
         }
-        this.emit(ev, { state: currState.buttons[id], event: ev });
+        this.emit(ev, { state: currState, event: ev });
         this.deviceEvent(`${ev} with state ${currState.buttons[id]}`)
       }
     }
     let delta
     for (let id = 0; id < NumOfDials; id++) {
       delta = currState.dials[id] - this.prevState.dials[id]
-      if (delta !== 0) {
+      if (currState.dialsRelative[id] !== 0) {
         let ev;
-        this.emit(DeviceEvents.DIAL[id].CHANGE, {state: currState.dials[id], event:ev})
-        if (delta > 0) {
+        this.emit(DeviceEvents.DIAL[id].CHANGE, { state: currState, event: ev })
+        if (currState.dialsRelative[id] > 0) {
           ev = DeviceEvents.DIAL[id].INCREMENT
         } else {
           ev = DeviceEvents.DIAL[id].DECREMENT
         }
-        this.emit(ev, {state: currState.dials[id], event:ev})
+        this.emit(ev, { state: currState, event: ev })
         this.deviceEvent(`${ev} with state ${currState.dials[id]}`)
       }
     }
@@ -327,10 +329,12 @@ export class MakeShiftPort extends EventEmitter implements Msger {
     let state: MakeShiftState = {
       buttons: [],
       dials: [],
+      dialsRelative: []
     }
 
     const buttonsRaw = data.subarray(0, 2).reverse()
-    const dialsRaw = data.subarray(2, 18)
+    const dialsRelativeRaw = data.subarray(2, 6)
+    const dialsRaw = data.subarray(6)
 
     function bytesToBin(button: number, bitCounter: number) {
       if (bitCounter === 0) { return; }
@@ -343,6 +347,9 @@ export class MakeShiftPort extends EventEmitter implements Msger {
     }
     buttonsRaw.forEach((b) => bytesToBin(b, 8),)
 
+    for (let i = 0; i < 4; i++) {
+      state.dialsRelative.push(dialsRelativeRaw.readInt8(i))
+    }
     state.dials.push(dialsRaw.readInt32BE(0))
     state.dials.push(dialsRaw.readInt32BE(4))
     state.dials.push(dialsRaw.readInt32BE(8))

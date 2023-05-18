@@ -41,6 +41,7 @@ export declare const defaultMakeShiftPortOptions: {
 export type MakeShiftState = {
     buttons: boolean[];
     dials: number[];
+    dialsRelative: number[];
 };
 export declare class MakeShiftPort extends EventEmitter implements Msger {
     private serialPort;
