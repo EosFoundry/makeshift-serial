@@ -46,7 +46,7 @@ export declare function setShowTime(s: boolean): void;
  * @param lv - desired {@link LogLevel}
  */
 export declare function setLogLevel(lv: LogLevel): void;
-export declare function setPortLogLevel(portId: string, lv: LogLevel): void;
+export declare function setPortLogLevel(deviceSerial: string, lv: LogLevel): void;
 /**
  * Sets the logging level of PortAuthority
  *

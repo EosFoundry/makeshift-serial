@@ -84,19 +84,27 @@ export class MakeShiftPort extends EventEmitter implements Msger {
 
   private keepAliveTimer: NodeJS.Timer
 
-  public get prevAckTime(): number { return this._prevAckTime }
-  public get isOpen() {
-    return (typeof this.serialPort !== 'undefined' && this.serialPort.isOpen)
-  }
 
   //---------- static get/setters
 
   /**
-   * This technically is a library global, it keeps track of the number of open ports
+   * This is a library global, it keeps track of the number of open ports
    */
   static get connectedDevices(): number { return _connectedDevices }
 
   //---------- public get/setters
+
+  /**
+   * This is the time that the last ack was received from the MakeShift device
+   */
+  public get prevAckTime(): number { return this._prevAckTime }
+
+  /**
+   * Direct access to the isOpen property of the internal SerialPort instance
+   */
+  public get isOpen() {
+    return (typeof this.serialPort !== 'undefined' && this.serialPort.isOpen)
+  }
 
   /**
    * If device connected, returns the path as a string, else returns empty string 
@@ -110,11 +118,7 @@ export class MakeShiftPort extends EventEmitter implements Msger {
   }
 
   public get deviceSerial(): string {
-    if (this._portInfo !== null) {
-      return this._portInfo.serialNumber
-    } else {
-      return ''
-    }
+    return this._id
   }
   public get fingerPrint(): MakeShiftPortFingerprint {
     return {
@@ -131,7 +135,11 @@ export class MakeShiftPort extends EventEmitter implements Msger {
    * 23 character id assigned to port on instantiation
    */
   public get portId(): string {
-    return this._id
+    if (this._portInfo !== null) {
+      return this._portInfo.serialNumber
+    } else {
+      return ''
+    }
     // if (this._portInfo !== null) {
     //   return this._portInfo.serialNumber
     // } else { return this._id }
@@ -149,12 +157,14 @@ export class MakeShiftPort extends EventEmitter implements Msger {
   private fatal: Function
 
   private get host(): string {
-    let str = `Port:${chalk.magenta(this.deviceSerial.slice(0, 4))}|`
-    if (this.isOpen) {
-      str += chalk.green(filename(this.devicePath))
+    let str = 'Port:' + chalk.green(filename(this.devicePath)) + '|'
+
+    if (this._deviceReady) {
+      str += chalk.magenta(this.deviceSerial.slice(0, 4))
     } else {
       str += chalk.yellow('D/C')
     }
+
     return str
   }
 
@@ -183,7 +193,6 @@ export class MakeShiftPort extends EventEmitter implements Msger {
 
     const finalOpts = defu(options, defaultMakeShiftPortOptions);
     // console.log(finalOpts)
-    this._id = finalOpts.id === '' ? nanoid(23) : finalOpts.id
     this._portInfo = finalOpts.portInfo as PortInfo
     // set up logging
     this._msger = new Msg()
@@ -247,6 +256,8 @@ export class MakeShiftPort extends EventEmitter implements Msger {
         this.debug(body.toString())
         _connectedDevices++
         this._deviceReady = true;
+        this._id = body.toString().replaceAll('-', '')
+        this._msger.host = this.host // reset the host to reflect new id
         this._prevAckTime = Date.now()
         this.deviceEvent(`Device connection established`)
         this.emit(DeviceEvents.DEVICE.CONNECTED, this.fingerPrint)
@@ -365,7 +376,8 @@ export class MakeShiftPort extends EventEmitter implements Msger {
     }, (e) => {
       if (e != null) {
         this.error(`Something happened while opening port: `)
-        this.error(e);
+        this.error(e)
+        this.emit(DeviceEvents.DEVICE.CONNECTION_ERROR, e)
       } else {
         this._msger.host = this.host
         this.info('SerialPort opened, attaching SLIP translators')
@@ -521,6 +533,7 @@ export const DeviceEvents = {
     },
   ],
   DEVICE: {
+    CONNECTION_ERROR: 'makeshift-connection-error',
     DISCONNECTED: 'makeshift-disconnect',
     CONNECTED: 'makeshift-connect',
     /**
@@ -565,7 +578,9 @@ function flattenEmitterApi(obj) {
   }
   return ret
 }
+
 export const DeviceEventsFlat = flattenEmitterApi(DeviceEvents)
+
 
 const NumOfButtons = DeviceEvents.BUTTON.length;
 

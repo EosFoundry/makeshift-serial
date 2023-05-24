@@ -12,6 +12,7 @@ import { LogLevel, Msg, nspct2, nspect } from '@eos-makeshift/msg'
 import { nanoid } from 'nanoid'
 import { PortInfo } from '@serialport/bindings-interface'
 import { EventEmitter } from 'node:events'
+import chalk from 'chalk'
 
 /**
  * This object contains all connected instances of {@link MakeShiftPort}
@@ -99,9 +100,9 @@ export function setLogLevel(lv: LogLevel): void {
   }
 }
 
-export function setPortLogLevel(portId: string, lv: LogLevel): void {
-  if (typeof Ports[portId] !== 'undefined') {
-    Ports[portId].logLevel = lv
+export function setPortLogLevel(deviceSerial: string, lv: LogLevel): void {
+  if (typeof Ports[deviceSerial] !== 'undefined') {
+    Ports[deviceSerial].logLevel = lv
   }
 }
 
@@ -120,28 +121,28 @@ function setScannerTimeout() {
   PortAuthority.emit(PortAuthorityEvents.scan.started)
 }
 
-function setKeepAliveTimeout(portId: string) {
-  keepAliveTimers[portId] = setTimeout(() => { 
-    checkAlive(portId) 
+function setKeepAliveTimeout(deviceSerial: string) {
+  keepAliveTimers[deviceSerial] = setTimeout(() => {
+    checkAlive(deviceSerial)
   }, keepAlivePollTimeMs)
 }
 
-function checkAlive(portId) {
-  const elapsedTime = Date.now() - Ports[portId].prevAckTime
+function checkAlive(deviceSerial) {
+  const elapsedTime = Date.now() - Ports[deviceSerial].prevAckTime
   log.debug(`elapsedTime since prevAckTime: ${elapsedTime}`)
 
   if (elapsedTime > keepAliveTimeMs) {
-    clearTimeout(keepAliveTimers[portId])
+    clearTimeout(keepAliveTimers[deviceSerial])
 
-    log.debug(`Timer handle - ${keepAliveTimers[portId]}`)
-    log.warn(`Device ${portId}::${Ports[portId].devicePath} unresponsive for ${keepAliveTimeMs}ms, disconnecting`)
+    log.debug(`Timer handle - ${keepAliveTimers[deviceSerial]}`)
+    log.warn(`Device ${deviceSerial}::${Ports[deviceSerial].devicePath} unresponsive for ${keepAliveTimeMs}ms, disconnecting`)
 
-    closePort(portId)
+    closePort(deviceSerial)
   } else {
     if (elapsedTime >= keepAlivePollTimeMs - 40) {
-      Ports[portId].ping()
+      Ports[deviceSerial].ping()
     }
-    setKeepAliveTimeout(portId)
+    setKeepAliveTimeout(deviceSerial)
   }
 }
 
@@ -169,21 +170,29 @@ function openPort(portInfo: PortInfo) {
     }
   }
   // if no devices with given path is found, a new device is created
-  const id = portInfo.serialNumber
   const options = {
     portInfo: portInfo,
-    id: id,
     logLevel: logLevel,
     showTime: showTime,
   }
+
   log.info(`Opening device with options: '${nspect(options, 1)}'`)
-  Ports[id] = new MakeShiftPort(options)
-  const fp = Ports[id].fingerPrint
-  portFingerPrints.push(fp)
-  Ports[id].ping()
-  setKeepAliveTimeout(id)
-  log.deviceEvent(`Opened port: ${fp.deviceSerial} | ${fp.devicePath}`)
-  PortAuthority.emit(PortAuthorityEvents.port.opened, fp)
+
+  let maybePort = new MakeShiftPort(options)
+
+  maybePort.once(DeviceEvents.DEVICE.CONNECTED, (fp: MakeShiftPortFingerprint) => {
+    const id = fp.deviceSerial
+    Ports[id] = maybePort
+    portFingerPrints.push(fp)
+    Ports[id].ping()
+    setKeepAliveTimeout(id)
+    log.deviceEvent(`Opened port ${fp.devicePath}, with deviceSerial ${chalk.magenta(fp.deviceSerial)}`)
+    PortAuthority.emit(PortAuthorityEvents.port.opened, fp)
+  })
+  
+  maybePort.once(DeviceEvents.DEVICE.CONNECTION_ERROR, (err: Error) => {
+    log.error(`Error opening device on port ${path}: ${err.message}`)
+  })
 }
 
 /**

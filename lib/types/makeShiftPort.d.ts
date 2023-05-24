@@ -54,12 +54,18 @@ export declare class MakeShiftPort extends EventEmitter implements Msger {
     private _portInfo;
     private _msger;
     private keepAliveTimer;
-    get prevAckTime(): number;
-    get isOpen(): boolean;
     /**
-     * This technically is a library global, it keeps track of the number of open ports
+     * This is a library global, it keeps track of the number of open ports
      */
     static get connectedDevices(): number;
+    /**
+     * This is the time that the last ack was received from the MakeShift device
+     */
+    get prevAckTime(): number;
+    /**
+     * Direct access to the isOpen property of the internal SerialPort instance
+     */
+    get isOpen(): boolean;
     /**
      * If device connected, returns the path as a string, else returns empty string
      */
@@ -120,6 +126,7 @@ export declare const DeviceEvents: {
         CHANGE: string;
     }[];
     DEVICE: {
+        CONNECTION_ERROR: string;
         DISCONNECTED: string;
         CONNECTED: string;
         /**
