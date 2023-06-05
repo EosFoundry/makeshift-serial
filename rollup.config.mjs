@@ -25,10 +25,12 @@ export default {
     {
       file: 'lib/makeshift-serial.mjs',
       format: 'module',
+      inlineDynamicImports: true,
     },
     {
       file: 'lib/makeshift-serial.umd.js',
       format: 'cjs',
+      inlineDynamicImports: true,
     },
   ],
   plugins: [

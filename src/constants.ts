@@ -1,5 +1,6 @@
 import { MsgLvStringMap } from "@eos-makeshift/msg";
-import * as DeviceSensorEvents from "../hardware-descriptors/generated/makeshift-events.json";
+import { readFileSync } from "fs";
+const DeviceSensorEvents = JSON.parse(readFileSync("src/hardware-descriptors/generated/makeshift-events.json", "utf8"))
 
 const DeviceFirmwareEvents = {
   DEVICE: {
