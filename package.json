@@ -27,6 +27,7 @@
   "scripts": {
     "dev": "rollup -c rollup.config.mjs -w",
     "gen-changelog": "node ./scripts/changelog.mjs",
+    "postversion": "node ./scripts/changelog.mjs",
     "build": "rollup -c rollup.config.mjs && tsc --emitDeclarationOnly && typedoc",
     "gen-typedoc": "typedoc",
     "monitor": "node ./bin/makeshift-monitor.mjs",
