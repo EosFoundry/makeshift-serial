@@ -28,7 +28,7 @@ export default {
       inlineDynamicImports: true,
     },
     {
-      file: 'lib/makeshift-serial.umd.js',
+      file: 'lib/makeshift-serial.umd.cjs',
       format: 'cjs',
       inlineDynamicImports: true,
     },

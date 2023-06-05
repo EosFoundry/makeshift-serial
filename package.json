@@ -16,7 +16,7 @@
   "exports": {
     ".": {
       "import": "./lib/makeshift-serial.mjs",
-      "require": "./lib/makeshift-serial.umd.js"
+      "require": "./lib/makeshift-serial.umd.cjs"
     }
   },
   "files": [
