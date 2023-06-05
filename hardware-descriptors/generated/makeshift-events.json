@@ -1,0 +1,106 @@
+{
+  "DIAL": [
+    {
+      "INCREMENT": "sensor-0-dial-increment",
+      "DECREMENT": "sensor-0-dial-decrement",
+      "CHANGED": "sensor-0-dial-changed"
+    },
+    {
+      "INCREMENT": "sensor-1-dial-increment",
+      "DECREMENT": "sensor-1-dial-decrement",
+      "CHANGED": "sensor-1-dial-changed"
+    },
+    {
+      "INCREMENT": "sensor-2-dial-increment",
+      "DECREMENT": "sensor-2-dial-decrement",
+      "CHANGED": "sensor-2-dial-changed"
+    },
+    {
+      "INCREMENT": "sensor-3-dial-increment",
+      "DECREMENT": "sensor-3-dial-decrement",
+      "CHANGED": "sensor-3-dial-changed"
+    }
+  ],
+  "BUTTON": [
+    {
+      "PRESSED": "sensor-0-button-pressed",
+      "RELEASED": "sensor-0-button-released",
+      "CHANGED": "sensor-0-button-changed"
+    },
+    {
+      "PRESSED": "sensor-1-button-pressed",
+      "RELEASED": "sensor-1-button-released",
+      "CHANGED": "sensor-1-button-changed"
+    },
+    {
+      "PRESSED": "sensor-2-button-pressed",
+      "RELEASED": "sensor-2-button-released",
+      "CHANGED": "sensor-2-button-changed"
+    },
+    {
+      "PRESSED": "sensor-3-button-pressed",
+      "RELEASED": "sensor-3-button-released",
+      "CHANGED": "sensor-3-button-changed"
+    },
+    {
+      "PRESSED": "sensor-4-button-pressed",
+      "RELEASED": "sensor-4-button-released",
+      "CHANGED": "sensor-4-button-changed"
+    },
+    {
+      "PRESSED": "sensor-5-button-pressed",
+      "RELEASED": "sensor-5-button-released",
+      "CHANGED": "sensor-5-button-changed"
+    },
+    {
+      "PRESSED": "sensor-6-button-pressed",
+      "RELEASED": "sensor-6-button-released",
+      "CHANGED": "sensor-6-button-changed"
+    },
+    {
+      "PRESSED": "sensor-7-button-pressed",
+      "RELEASED": "sensor-7-button-released",
+      "CHANGED": "sensor-7-button-changed"
+    },
+    {
+      "PRESSED": "sensor-8-button-pressed",
+      "RELEASED": "sensor-8-button-released",
+      "CHANGED": "sensor-8-button-changed"
+    },
+    {
+      "PRESSED": "sensor-9-button-pressed",
+      "RELEASED": "sensor-9-button-released",
+      "CHANGED": "sensor-9-button-changed"
+    },
+    {
+      "PRESSED": "sensor-10-button-pressed",
+      "RELEASED": "sensor-10-button-released",
+      "CHANGED": "sensor-10-button-changed"
+    },
+    {
+      "PRESSED": "sensor-11-button-pressed",
+      "RELEASED": "sensor-11-button-released",
+      "CHANGED": "sensor-11-button-changed"
+    },
+    {
+      "PRESSED": "sensor-12-button-pressed",
+      "RELEASED": "sensor-12-button-released",
+      "CHANGED": "sensor-12-button-changed"
+    },
+    {
+      "PRESSED": "sensor-13-button-pressed",
+      "RELEASED": "sensor-13-button-released",
+      "CHANGED": "sensor-13-button-changed"
+    },
+    {
+      "PRESSED": "sensor-14-button-pressed",
+      "RELEASED": "sensor-14-button-released",
+      "CHANGED": "sensor-14-button-changed"
+    },
+    {
+      "PRESSED": "sensor-15-button-pressed",
+      "RELEASED": "sensor-15-button-released",
+      "CHANGED": "sensor-15-button-changed"
+    }
+  ]
+}

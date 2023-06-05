@@ -1,15 +1,21 @@
-import { SerialPort } from 'serialport'
 import { PortInfo } from '@serialport/bindings-interface'
 import { SlipEncoder, SlipDecoder } from '@serialport/parser-slip-encoder'
 import {
   Msg, strfy, nspct2, LogLevel, MsgLvFunctorMap, MsgOptions, Msger, LoggerFn, MsgLvStringMap
 } from '@eos-makeshift/msg'
+
 import { EventEmitter } from 'node:events'
 import { Buffer } from 'node:buffer'
+import { readFile } from 'node:fs/promises'
+import { fileURLToPath } from 'node:url'
+import { dirname, join } from 'node:path'
+
+import { SerialPort } from 'serialport'
 import { filename } from 'pathe/utils'
 import { nanoid } from 'nanoid'
 import chalk from 'chalk'
 import defu from 'defu'
+import { SerialEvents, DeviceEvents } from './constants.js'
 
 let _connectedDevices = 0;
 
@@ -180,7 +186,7 @@ export class MakeShiftPort extends EventEmitter implements Msger {
   public set logTermFormat(tf: boolean) { this._msger.terminal = tf }
 
   private emitLog: LoggerFn = (msg: string, lv: LogLevel) => {
-    this.emit(DeviceEvents.Terminal.Log[lv], {
+    this.emit(SerialEvents.Log[lv], {
       // terminal: this._msger.terminal,
       level: lv,
       message: msg,
@@ -229,6 +235,7 @@ export class MakeShiftPort extends EventEmitter implements Msger {
       case PacketType.STATE_UPDATE: {
         let newState = MakeShiftPort.parseStateFromBuffer(body)
         this.emit(DeviceEvents.DEVICE.STATE_UPDATE, newState)
+        this.debug('state updating')
         this.handleStateUpdate(newState)
         break
       }
@@ -274,6 +281,7 @@ export class MakeShiftPort extends EventEmitter implements Msger {
   ping() { this.sendByte(PacketType.PING) }
 
   private handleStateUpdate(currState: MakeShiftState) {
+    this.debug(`Handling state update`)
     for (let id = 0; id < NumOfButtons; id++) {
       if (currState.buttons[id] != this.prevState.buttons[id]) {
         let ev;
@@ -292,7 +300,7 @@ export class MakeShiftPort extends EventEmitter implements Msger {
       delta = currState.dials[id] - this.prevState.dials[id]
       if (currState.dialsRelative[id] !== 0) {
         let ev;
-        this.emit(DeviceEvents.DIAL[id].CHANGE, { state: currState, event: ev })
+        this.emit(DeviceEvents.DIAL[id].CHANGED, { state: currState, event: ev })
         if (currState.dialsRelative[id] > 0) {
           ev = DeviceEvents.DIAL[id].INCREMENT
         } else {
@@ -419,167 +427,7 @@ export class MakeShiftPort extends EventEmitter implements Msger {
 
 //---------- Long constants
 
-/** 
- * This constant encodes the MakeShitEvent API, this is done to avoid typing
- * long strings as much as possible, and to allow tooling to do its job
- *
- * Events are organized so they are accessible as:
- *     Events.DIAL[0].INCREMENT
-*/
-export const DeviceEvents = {
-  DIAL: [
-    {
-      INCREMENT: 'dial-01-increment',
-      DECREMENT: 'dial-01-decrement',
-      CHANGE: 'dial-01-change',
-    },
-    {
-      INCREMENT: 'dial-02-increment',
-      DECREMENT: 'dial-02-decrement',
-      CHANGE: 'dial-02-change',
-    },
-    {
-      INCREMENT: 'dial-03-increment',
-      DECREMENT: 'dial-03-decrement',
-      CHANGE: 'dial-03-change',
-    },
-    {
-      INCREMENT: 'dial-04-increment',
-      DECREMENT: 'dial-04-decrement',
-      CHANGE: 'dial-04-change',
-    },
-  ],
 
-  BUTTON: [
-    {
-      PRESSED: 'button-01-rise',
-      RELEASED: 'button-01-fall',
-      CHANGE: 'button-01-change',
-    },
-    {
-      PRESSED: 'button-02-rise',
-      RELEASED: 'button-02-fall',
-      CHANGE: 'button-02-change',
-    },
-    {
-      PRESSED: 'button-03-rise',
-      RELEASED: 'button-03-fall',
-      CHANGE: 'button-03-change',
-    },
-    {
-      PRESSED: 'button-04-rise',
-      RELEASED: 'button-04-fall',
-      CHANGE: 'button-04-change',
-    },
-    {
-      PRESSED: 'button-05-rise',
-      RELEASED: 'button-05-fall',
-      CHANGE: 'button-05-change',
-    },
-    {
-      PRESSED: 'button-06-rise',
-      RELEASED: 'button-06-fall',
-      CHANGE: 'button-06-change',
-    },
-    {
-      PRESSED: 'button-07-rise',
-      RELEASED: 'button-07-fall',
-      CHANGE: 'button-07-change',
-    },
-    {
-      PRESSED: 'button-08-rise',
-      RELEASED: 'button-08-fall',
-      CHANGE: 'button-08-change',
-    },
-    {
-      PRESSED: 'button-09-rise',
-      RELEASED: 'button-09-fall',
-      CHANGE: 'button-09-change',
-    },
-    {
-      PRESSED: 'button-10-rise',
-      RELEASED: 'button-10-fall',
-      CHANGE: 'button-10-change',
-    },
-    {
-      PRESSED: 'button-11-rise',
-      RELEASED: 'button-11-fall',
-      CHANGE: 'button-11-change',
-    },
-    {
-      PRESSED: 'button-12-rise',
-      RELEASED: 'button-12-fall',
-      CHANGE: 'button-12-change',
-    },
-    {
-      PRESSED: 'button-13-rise',
-      RELEASED: 'button-13-fall',
-      CHANGE: 'button-13-change',
-    },
-    {
-      PRESSED: 'button-14-rise',
-      RELEASED: 'button-14-fall',
-      CHANGE: 'button-14-change',
-    },
-    {
-      PRESSED: 'button-15-rise',
-      RELEASED: 'button-15-fall',
-      CHANGE: 'button-15-change',
-    },
-    {
-      PRESSED: 'button-16-rise',
-      RELEASED: 'button-16-fall',
-      CHANGE: 'button-16-change',
-    },
-  ],
-  DEVICE: {
-    CONNECTION_ERROR: 'makeshift-connection-error',
-    DISCONNECTED: 'makeshift-disconnect',
-    CONNECTED: 'makeshift-connect',
-    /**
-     * This event is emitted from a raw device signal, and contains *all* the
-     * data from a state update. This is useful when hacking on this library as
-     * it provides a ton of event information. For most purposes , it will likely
-     * be more useful to listen to specific input events -
-     * i.e. DeviceEvents.BUTTON[1].INCREMENT
-     */
-    STATE_UPDATE: 'state-update',
-  },
-  /**
-   * Reverts to regular casing for non-hardware events
-   */
-  Terminal: {
-    Log: {
-      fatal: 'makeshift-serial-log-fatal',
-      error: 'makeshift-serial-log-error',
-      warn: 'makeshift-serial-log-warn',
-      deviceEvent: 'makeshift-serial-log-event',
-      info: 'makeshift-serial-log-info',
-      debug: 'makeshift-serial-log-debug',
-      all: 'makeshift-serial-log-any',
-    } as MsgLvStringMap
-  }
-}
-export type MakeShiftDeviceEvents = typeof DeviceEvents
-
-function flattenEmitterApi(obj) {
-  const ret = []
-  for (const key in obj) {
-    if (typeof obj[key] === 'string') {
-      return obj[key]
-    } else {
-      const subArr = flattenEmitterApi(obj[key])
-      if (Array.isArray(subArr)) {
-        ret.push(...subArr)
-      } else {
-        ret.push(subArr)
-      }
-    }
-  }
-  return ret
-}
-
-export const DeviceEventsFlat = flattenEmitterApi(DeviceEvents)
 
 
 const NumOfButtons = DeviceEvents.BUTTON.length;

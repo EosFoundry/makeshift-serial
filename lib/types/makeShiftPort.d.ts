@@ -115,16 +115,12 @@ export declare class MakeShiftPort extends EventEmitter implements Msger {
  *     Events.DIAL[0].INCREMENT
 */
 export declare const DeviceEvents: {
-    DIAL: {
-        INCREMENT: string;
-        DECREMENT: string;
-        CHANGE: string;
-    }[];
-    BUTTON: {
-        PRESSED: string;
-        RELEASED: string;
-        CHANGE: string;
-    }[];
+    /**
+     * These events are automatically generated from the associated json file in
+     * the 'hardware-descriptors' folder.
+     */
+    DIAL: any[];
+    BUTTON: any[];
     DEVICE: {
         CONNECTION_ERROR: string;
         DISCONNECTED: string;

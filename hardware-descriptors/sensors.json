@@ -1,0 +1,24 @@
+{
+  "DIAL": {
+    "state": {
+      "type": "number",
+      "constraints": {
+        "min": -127,
+        "max": 128
+      }
+    },
+    "events": [
+      "increment",
+      "decrement"
+    ]
+  },
+  "BUTTON": {
+    "state": {
+      "type": "boolean"
+    },
+    "events": [
+      "pressed",
+      "released"
+    ]
+  }
+}

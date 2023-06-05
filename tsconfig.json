@@ -3,8 +3,9 @@
     "module": "ESNext",
     "target": "ESNext",
     "resolveJsonModule": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
+    "resolvePackageJsonImports": true,
     "declaration": true,
     "declarationDir": "./lib/types"
   },

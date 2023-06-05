@@ -69,4 +69,5 @@ export declare const PortAuthorityEvents: {
 };
 export type MakeShiftPortAuthorityEvents = typeof PortAuthorityEvents;
 export * from './makeShiftPort';
+export * from './constants';
 export { LogLevel, Msg, nspct2, nspect } from '@eos-makeshift/msg';

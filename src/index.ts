@@ -7,7 +7,8 @@
 // } from "./makeShiftPort"
 
 import { SerialPort } from 'serialport'
-import { DeviceEvents, MakeShiftPort, MakeShiftPortFingerprint } from './makeShiftPort'
+import { MakeShiftPort, MakeShiftPortFingerprint } from './makeShiftPort'
+import { DeviceEvents } from './constants'
 import { LogLevel, Msg, nspct2, nspect } from '@eos-makeshift/msg'
 import { nanoid } from 'nanoid'
 import { PortInfo } from '@serialport/bindings-interface'
@@ -242,9 +243,12 @@ export const PortAuthorityEvents = {
     stopped: 'makeshift-pa-scan-stopped',
   }
 }
+
 export type MakeShiftPortAuthorityEvents = typeof PortAuthorityEvents
 
 export * from './makeShiftPort'
+export * from './constants'
 
 // export for documentation?
-export { LogLevel, Msg, nspct2, nspect } from '@eos-makeshift/msg'
+// export type LogLevel = LogLevel
+// export { Msg, nspct2, nspect } from '@eos-makeshift/msg'

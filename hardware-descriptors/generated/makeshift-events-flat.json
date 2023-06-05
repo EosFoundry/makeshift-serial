@@ -1,0 +1,22 @@
+[
+  "sensor-0-dial-increment",
+  "sensor-1-dial-increment",
+  "sensor-2-dial-increment",
+  "sensor-3-dial-increment",
+  "sensor-0-button-pressed",
+  "sensor-1-button-pressed",
+  "sensor-2-button-pressed",
+  "sensor-3-button-pressed",
+  "sensor-4-button-pressed",
+  "sensor-5-button-pressed",
+  "sensor-6-button-pressed",
+  "sensor-7-button-pressed",
+  "sensor-8-button-pressed",
+  "sensor-9-button-pressed",
+  "sensor-10-button-pressed",
+  "sensor-11-button-pressed",
+  "sensor-12-button-pressed",
+  "sensor-13-button-pressed",
+  "sensor-14-button-pressed",
+  "sensor-15-button-pressed"
+]
