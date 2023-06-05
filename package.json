@@ -19,6 +19,9 @@
       "require": "./lib/makeshift-serial.umd.js"
     }
   },
+  "files": [
+    "./hardware-descriptors/*"
+  ],
   "types": "./lib/types/index.d.ts",
   "scripts": {
     "dev": "rollup -c rollup.config.mjs -w",
