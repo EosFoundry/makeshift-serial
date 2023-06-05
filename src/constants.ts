@@ -22,6 +22,16 @@ const DeviceFirmwareEvents = {
   },
 }
 
+export const DeviceEvents = {
+  ...DeviceSensorEvents,
+  ...DeviceFirmwareEvents,
+}
+
+export const HardwareDescriptors ={
+  MakeShift: JSON.parse(readFileSync(join(__dirname, "../hardware-descriptors/makeshift.json"), "utf8")),
+  Sensors: JSON.parse(readFileSync(join(__dirname, "../hardware-descriptors/sensors.json"), "utf8")),
+}
+
 export const SerialEvents = {
   /**
    * Reverts to regular casing for non-hardware events
@@ -37,10 +47,6 @@ export const SerialEvents = {
   } as MsgLvStringMap
 }
 
-export const DeviceEvents = {
-  ...DeviceSensorEvents,
-  ...DeviceFirmwareEvents,
-}
 
 export type MakeShiftDeviceEvents = typeof DeviceEvents
 export type MakeShiftSerialEvents = typeof SerialEvents
