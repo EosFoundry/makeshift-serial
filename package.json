@@ -39,7 +39,7 @@
     "defu": "^6.1.2",
     "nanoid": "^4.0.2",
     "pathe": "^1.1.0",
-    "serialport": "^10.0.0",
+    "serialport": "^12.0.0",
     "yargs": "^17.7.2"
   },
   "devDependencies": {
@@ -48,11 +48,11 @@
     "@rollup/plugin-node-resolve": "^15.1.0",
     "@rollup/plugin-terser": "^0.4.3",
     "@rollup/plugin-typescript": "^11.1.1",
-    "@types/node": "^18.16.16",
+    "@types/node": "~18.17.0",
     "rollup": "^3.23.0",
     "semver": "^7.5.1",
     "terser": "^5.17.6",
-    "ts-morph": "^18.0.0",
+    "ts-morph": "^19.0.0",
     "tslib": "^2.5.2",
     "typescript": "^5.1.3"
   },

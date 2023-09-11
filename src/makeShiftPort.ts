@@ -247,6 +247,7 @@ export class MakeShiftPort extends EventEmitter implements Msger {
       }
       case PacketType.STRING: {
         this.debug(body.toString())
+        this.emit(DeviceEvents.SERIAL.MESSAGE, body.toString())
         break
       }
       case PacketType.PING: {

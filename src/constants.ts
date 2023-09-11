@@ -20,6 +20,9 @@ const DeviceFirmwareEvents = {
      */
     STATE_UPDATE: 'state-update',
   },
+  SERIAL: {
+    MESSAGE: 'makeshift-serial-message',
+  }
 }
 
 export const DeviceEvents = {

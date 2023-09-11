@@ -128,7 +128,7 @@ function setKeepAliveTimeout(deviceSerial: string) {
   }, keepAlivePollTimeMs)
 }
 
-function checkAlive(deviceSerial) {
+function checkAlive(deviceSerial: string) {
   const elapsedTime = Date.now() - Ports[deviceSerial].prevAckTime
   log.debug(`elapsedTime since prevAckTime: ${elapsedTime}`)
 

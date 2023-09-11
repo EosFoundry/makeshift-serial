@@ -11,6 +11,7 @@ const tsconfig = JSON.parse(readFileSync('./tsconfig.json'))
 
 // this is a workaround for 
 // https://github.com/rollup/plugins/issues/1253
+
 delete tsconfig.typedocOptions
 tsconfig.compilerOptions.declarationDir = path.resolve('./lib/types')
 
